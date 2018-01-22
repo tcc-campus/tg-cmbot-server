@@ -1,7 +1,7 @@
 const config = require('../config');
 const request = require('request');
 
-function set_webhook() {
+function setWebHook() {
   console.log("Setting Webhook on Telegram");
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/setWebhook`;
@@ -27,5 +27,5 @@ function set_webhook() {
 }
 
 module.exports = {
-  set_webhook,
+  setWebHook,
 }

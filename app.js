@@ -6,8 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-// var webhook = require('./routes/webhook');
-var tg_caller = require('./api_callers/telegram_caller');
+var webhook = require('./routes/webhook');
+var tgCaller = require('./api_callers/telegram_caller');
+var config = require('./config');
 
 var app = express();
 
@@ -24,7 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-// app.use('/webhook', webhook);
+app.use(`/bot${config.BOT_TOKEN}`, webhook);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,15 +46,7 @@ app.use(function(err, req, res, next) {
 });
 
 // setup telegram WebHook
-
-// Telegraf setup
-// const TG_BOT_TOKEN = process.env.BOT_TOKEN
-// const URL = `${process.env.PUBLIC_URL}/bot${TG_BOT_TOKEN}`;
-//
-// const bot = new Telegraf(TG_BOT_TOKEN)
-// bot.telegram.setWebHook(URL);
-// bot.startWebHook(`/bot${TG_BOT_TOKEN}`, null, 3000);
-tg_caller.set_webhook().then((result) => {
+tgCaller.setWebHook().then((result) => {
   console.log(result);
 }).catch((error) => {
   console.log(error);
