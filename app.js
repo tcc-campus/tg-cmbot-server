@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var webhook = require('./routes/webhook');
+var platform = require('./routes/platform');
+
 var tgCaller = require('./api_callers/telegram_caller');
 var config = require('./config');
 
@@ -26,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use(`/bot${config.BOT_TOKEN}`, webhook);
+app.use(`/platform${config.BOT_TOKEN}`, platform);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
