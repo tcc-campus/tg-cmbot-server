@@ -3,7 +3,7 @@ const tg_caller = require('../api_callers/telegram_caller');
 function handleTgEvent(eventObj) {
   const chatId = eventObj.message.chat.id;
   const text = eventObj.message.text.trim();
-  if isCommandReceived(text) {
+  if (isCommandReceived(text)) {
     const command = text.substr(1);
     console.log("Command Detected: " + command);
     handleCommand(chatId, command);
