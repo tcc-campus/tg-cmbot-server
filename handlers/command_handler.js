@@ -4,6 +4,7 @@
 */
 
 const tg_caller = require('../api_callers/telegram_caller');
+const pf_caller = require('../api_callers/platform_caller');
 
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
@@ -44,24 +45,35 @@ function handleStart(chatId, firstName) {
 }
 
 function handleSubscribe(chatId, firstName) {
-  const message = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. \
+  const successMessage = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. \
   Type /unsubscribe if you no longer want updates. God Bless!`;
+  const failureMessage = `I'm sorry, ${firstName}, there was an error registering your subscription. Please try again!`
 
-  console.log(`Send subscriber info - ${chatId} and ${firstName} to backend`);
+  console.log(`Sending new subscriber request to backend: ${chatId}, ${firstName}`);
 
-  tg_caller.sendMessage(chatId, message).then((result) => {
+  pf_caller.postSubscribe(chatId, firstName).then((result) => {
     console.log(result);
+    tg_caller.sendMessage(chatId, successMessage).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.log(error);
+    });
   }).catch((error) => {
     console.log(error);
-  });
+    tg_caller.sendMessage(chatId, failureMessage).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.log(error);
+    });
+  })
 }
 
 function handleHelp(chatId) {
-  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n \
-  *Available Commands:*\n \
-  /upcoming - Get a list of upcoming events\n \
-  /subscribe - Subscribe to push notifications on upcoming Campus Events \n \
-  /unsubscribe - Unsubscribe from push notifications\n \
+  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n\
+  *Available Commands:*\n\
+  /upcoming - Get a list of upcoming events\n\
+  /subscribe - Subscribe to push notifications on upcoming Campus Events \n\
+  /unsubscribe - Unsubscribe from push notifications\n\
   /help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
