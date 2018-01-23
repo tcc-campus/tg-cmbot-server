@@ -22,7 +22,7 @@ function handleCommand(chatId, msgObj, command) {
       handleSubscribe(chatId, firstName);
       break;
     case 'unsubscribe':
-      response = "Sure, I will stop sending you updates. You can always type /subscribe if you want me to update you again!";
+      response = "Sure, I will stop sending you updates. You can always type /subscribe if you want me to update you again! God Bless";
       handleOtherCommands(chatId, response);
       break;
     case 'help':
@@ -50,7 +50,30 @@ function handleSubscribe(chatId, firstName) {
 
   console.log(`Sending new subscriber request to backend: ${chatId}, ${firstName}`);
 
-  pf_caller.postSubscribe(chatId, firstName).then((result) => {
+  pf_caller.postSubscriber(chatId, firstName).then((result) => {
+    console.log(result);
+    tg_caller.sendMessage(chatId, successMessage).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.log(error);
+    });
+  }).catch((error) => {
+    console.log(error);
+    tg_caller.sendMessage(chatId, failureMessage).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.log(error);
+    });
+  })
+}
+
+function handleUnsubscrbie(chatId, firstName) {
+  const successMessage = `Sure, ${firstName}, I will stop sending you updates. You can always type /subscribe if you want me to update you again! God Bless!`;
+  const failureMessage = `I'm sorry, ${firstName}, there was an error unsubscribing you from my list. Please try again!`
+
+  console.log(`Sending unsubscribe request to backend for id: ${chatId}`);
+
+  pf_caller.deleteSubscriber(chatId).then((result) => {
     console.log(result);
     tg_caller.sendMessage(chatId, successMessage).then((result) => {
       console.log(result);
