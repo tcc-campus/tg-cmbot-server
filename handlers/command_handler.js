@@ -22,8 +22,7 @@ function handleCommand(chatId, msgObj, command) {
       handleSubscribe(chatId, firstName);
       break;
     case 'unsubscribe':
-      response = "Sure, I will stop sending you updates. You can always type /subscribe if you want me to update you again! God Bless";
-      handleOtherCommands(chatId, response);
+      handleUnsubscrbie(chatId, response);
       break;
     case 'help':
       handleHelp(chatId);
