@@ -22,7 +22,7 @@ function handleCommand(chatId, msgObj, command) {
       handleSubscribe(chatId, firstName);
       break;
     case 'unsubscribe':
-      handleUnsubscribe(chatId, response);
+      handleUnsubscribe(chatId, firstName);
       break;
     case 'help':
       handleHelp(chatId);
