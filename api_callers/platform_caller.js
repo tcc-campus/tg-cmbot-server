@@ -37,7 +37,6 @@ function deleteSubscriber(chatId) {
     const options = {
       method: 'delete',
       url: url,
-      headers: {'content-type': 'application/json' },
       qs: {
         id: chatId
       }

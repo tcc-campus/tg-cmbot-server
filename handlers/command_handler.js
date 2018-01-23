@@ -28,7 +28,8 @@ function handleCommand(chatId, msgObj, command) {
       handleHelp(chatId);
       break;
     default:
-      handleUnknownCommand(chatId);
+      response = "Oops sorry, I don't understand the command. Type /help to get a list of available commands 😁"
+      handleUnknownCommand(chatId, response);
       break;
   }
 }
