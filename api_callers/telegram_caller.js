@@ -31,7 +31,7 @@ function setWebHook() {
   });
 }
 
-function sendMessage(chatId, message) {
+function sendMessage(chatId, message, options) {
   console.log("Sending Message to chat_id:" + chatId);
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/sendMessage`;
@@ -42,6 +42,7 @@ function sendMessage(chatId, message) {
       body: {
         chat_id: chatId,
         text: message,
+        parse_mode: options.parse_mode ? options.parse_mode : '',
       },
       json: true,
     };

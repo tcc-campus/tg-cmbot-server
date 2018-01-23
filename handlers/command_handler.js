@@ -12,6 +12,7 @@ function handleCommand(chatId, msgObj, command) {
   switch(command) {
     case 'start':
       handleStart(chatId, firstName);
+      break;
     case 'upcoming':
       response = "I'll send you upcoming events when I have them";
       handleOtherCommands(chatId, response);
@@ -32,19 +33,27 @@ function handleCommand(chatId, msgObj, command) {
       handleUnknownCommand(chatId);
       break;
   }
-
-
-  tg_caller.sendMessage(chatId, response).then((result) => {
-    console.log(result);
-  }).catch((error) => {
-    console.log(error);
-  });
 }
 
 function handleStart(chatId, firstName) {
   const message = `Hello ${firstName}! I'm Campus Ministry Bot. Type /help or click on the slash button below to know the commands you can use!`;
 
   tg_caller.sendMessage(chatId, message).then((result) => {
+    console.log(result);
+  }).catch((error) => {
+    console.log(error);
+  });
+}
+
+function handleHelp(chatId) {
+  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n \
+  *Available Commands:*\n \
+  /upcoming - Get a list of upcoming events\n \
+  /subscribe - Subscribe to push notifications on upcoming Campus Events \n \
+  /unsubscribe - Unsubscribe from push notifications\n \
+  /help - Get help!"
+
+  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result);
   }).catch((error) => {
     console.log(error);
