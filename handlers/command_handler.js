@@ -18,11 +18,10 @@ function handleCommand(chatId, msgObj, command) {
       handleOtherCommands(chatId, response);
       break;
     case 'subscribe':
-      response = "Thanks for your interest, subscription will be available soon!";
-      handleOtherCommands(chatId, response);
+      handleSubscribe(chatId, firstName);
       break;
     case 'unsubscribe':
-      response = "If you can't subscribe, you can't unsubscribe :P";
+      response = "Sure, I will stop sending you updates. You can always type /subscribe if you want me to update you again!";
       handleOtherCommands(chatId, response);
       break;
     case 'help':
@@ -44,13 +43,26 @@ function handleStart(chatId, firstName) {
   });
 }
 
+function handleSubscribe(chatId, firstName) {
+  const message = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. \
+  Type /unsubscribe if you no longer want updates. God Bless!`;
+
+  console.log(`Send subscriber info - ${chatId} and ${firstName} to backend`);
+
+  tg_caller.sendMessage(chatId, message).then((result) => {
+    console.log(result);
+  }).catch((error) => {
+    console.log(error);
+  });
+}
+
 function handleHelp(chatId) {
   const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n \
   *Available Commands:*\n \
   /upcoming - Get a list of upcoming events\n \
   /subscribe - Subscribe to push notifications on upcoming Campus Events \n \
   /unsubscribe - Unsubscribe from push notifications\n \
-  /help - Get help!"
+  /help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result);
