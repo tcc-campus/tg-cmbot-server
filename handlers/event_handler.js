@@ -1,54 +1,26 @@
-const tg_caller = require('../api_callers/telegram_caller');
+/* Modules to handle events from external servers
+*   Exported Modules:
+*     1. handleTgEvent(eventObj): For handling telegram Events
+*/
+
+const msg_handler = require('./message_handler');
 
 function handleTgEvent(eventObj) {
-  const chatId = eventObj.message.chat.id;
-  const text = eventObj.message.text.trim();
-  if (isCommandReceived(text)) {
-    const command = text.substr(1);
-    console.log("Command Detected: " + command);
-    handleCommand(chatId, command);
+  console.log("Handling Telegram Event");
+  if (eventObj.message) {
+    msg_handler.handleMessageEvent(eventObj.message);
+  } else if (eventObj.edited_message) {
+      console.log("edited_message event detected");
+  } else if (eventObj.channel_post ) {
+      console.log("channel_post event detected");
+  } else if (eventObj.edited_channel_post) {
+      console.log("edited_channel_post event detected");
+  } else if (eventObj.inline_query) {
+      console.log("inline_query event detected");
+  } else if (eventObj.chosen_inline_result) {
+      console.log("chosen_inline_result event detected");
   } else {
-    console.log("Echoing Message")
-    tg_caller.sendMessage(chatId, text).then((result) => {
-      console.log(result);
-    }).catch((error) => {
-      console.log(error);
-    });
-  }
-}
-
-function handleCommand(chatId, command) {
-  let response = '';
-
-  switch(command) {
-    case 'upcoming':
-      response = "I'll send you upcoming events when I have them";
-      break;
-    case 'subscribe':
-      response = "Thanks for your interest, subscription will be available soon!";
-      break;
-    case 'unsubscribe':
-      response = "If you can't subscribe, you can't unsubscribe :P";
-      break;
-    case 'help':
-      response = "Help is coming soon...";
-      break;
-    default:
-      break;
-  }
-  console.log("Handling Command: " + command)
-  tg_caller.sendMessage(chatId, response).then((result) => {
-    console.log(result);
-  }).catch((error) => {
-    console.log(error);
-  });
-}
-
-function isCommandReceived(text) {
-  if (text.charAt(0) === '/') {
-    return true;
-  } else {
-    return false;
+      console.log("unknown event detected");
   }
 }
 
