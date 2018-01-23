@@ -33,6 +33,10 @@ function setWebHook() {
 
 function sendMessage(chatId, message, options) {
   console.log("Sending Message to chat_id:" + chatId);
+  let parseMode = '';
+  if(options) {
+    parseMode = options.parse_mode ? options.parse_mode : '',
+  }
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/sendMessage`;
     const options = {
@@ -42,7 +46,7 @@ function sendMessage(chatId, message, options) {
       body: {
         chat_id: chatId,
         text: message,
-        parse_mode: options.parse_mode ? options.parse_mode : '',
+        parse_mode: parseMode,
       },
       json: true,
     };
