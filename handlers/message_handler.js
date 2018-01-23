@@ -15,7 +15,7 @@ function handleMessageEvent(msgObj) {
     cmd_handler.handleCommand(chatId, msgObj, command);
   } else {
     console.log("Echoing Message")
-    tg_caller.sendMessage(chatId, text, {}).then((result) => {
+    tg_caller.sendMessage(chatId, text).then((result) => {
       console.log(result);
     }).catch((error) => {
       console.log(error);

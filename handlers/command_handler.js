@@ -38,7 +38,7 @@ function handleCommand(chatId, msgObj, command) {
 function handleStart(chatId, firstName) {
   const message = `Hello ${firstName}! I'm Campus Ministry Bot. Type /help or click on the slash button below to know the commands you can use!`;
 
-  tg_caller.sendMessage(chatId, message, {}).then((result) => {
+  tg_caller.sendMessage(chatId, message).then((result) => {
     console.log(result);
   }).catch((error) => {
     console.log(error);
@@ -62,7 +62,7 @@ function handleHelp(chatId) {
 
 function handleOtherCommands(chatId, message) {
 
-  tg_caller.sendMessage(chatId, message, {}).then((result) => {
+  tg_caller.sendMessage(chatId, message).then((result) => {
     console.log(result);
   }).catch((error) => {
     console.log(error);
@@ -71,7 +71,7 @@ function handleOtherCommands(chatId, message) {
 
 function handleUnknownCommand(chatId) {
   const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands!"
-  tg_caller.sendMessage(chatId, message, {}).then((result) => {
+  tg_caller.sendMessage(chatId, message).then((result) => {
     console.log(result);
   }).catch((error) => {
     console.log(error);
