@@ -35,7 +35,7 @@ function sendMessage(chatId, message, options) {
   console.log("Sending Message to chat_id:" + chatId);
   let parseMode = '';
   if(options) {
-    parseMode = options.parse_mode ? options.parse_mode : '',
+    parseMode = options.parse_mode ? options.parse_mode : '';
   }
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/sendMessage`;
