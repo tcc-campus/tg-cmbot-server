@@ -45,8 +45,7 @@ function handleStart(chatId, firstName) {
 }
 
 function handleSubscribe(chatId, firstName) {
-  const successMessage = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. \
-  Type /unsubscribe if you no longer want updates. God Bless!`;
+  const successMessage = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. Type /unsubscribe if you no longer want updates. God Bless!`;
   const failureMessage = `I'm sorry, ${firstName}, there was an error registering your subscription. Please try again!`
 
   console.log(`Sending new subscriber request to backend: ${chatId}, ${firstName}`);
@@ -69,12 +68,7 @@ function handleSubscribe(chatId, firstName) {
 }
 
 function handleHelp(chatId) {
-  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n\
-  *Available Commands:*\n\
-  /upcoming - Get a list of upcoming events\n\
-  /subscribe - Subscribe to push notifications on upcoming Campus Events \n\
-  /unsubscribe - Unsubscribe from push notifications\n\
-  /help - Get help!";
+  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n\/help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result);
