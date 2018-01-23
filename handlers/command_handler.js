@@ -26,8 +26,7 @@ function handleCommand(chatId, msgObj, command) {
       handleOtherCommands(chatId, response);
       break;
     case 'help':
-      response = "Help is coming soon...";
-      handleOtherCommands(chatId, response);
+      handleHelp(chatId);
       break;
     default:
       handleUnknownCommand(chatId);
