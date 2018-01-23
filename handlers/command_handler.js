@@ -22,7 +22,7 @@ function handleCommand(chatId, msgObj, command) {
       handleSubscribe(chatId, firstName);
       break;
     case 'unsubscribe':
-      handleUnsubscrbie(chatId, response);
+      handleUnsubscribe(chatId, response);
       break;
     case 'help':
       handleHelp(chatId);
@@ -66,7 +66,7 @@ function handleSubscribe(chatId, firstName) {
   })
 }
 
-function handleUnsubscrbie(chatId, firstName) {
+function handleUnsubscribe(chatId, firstName) {
   const successMessage = `Sure, ${firstName}, I will stop sending you updates. You can always type /subscribe if you want me to update you again! God Bless!`;
   const failureMessage = `I'm sorry, ${firstName}, there was an error unsubscribing you from my list. Please try again!`
 
