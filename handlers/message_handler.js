@@ -17,13 +17,15 @@ function handleMessageEvent(msgObj) {
     const command = text.substr(1);
     console.log("Command Detected: " + command);
     cmd_handler.handleCommand(chatId, msgObj, command);
-  } else {
+  } else if (text) {
     console.log("Echoing Message")
     tg_caller.sendMessage(chatId, text).then((result) => {
       console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
+  } else {
+    console.log("Unhandled Message Event received: " + msgObj);
   }
 }
 

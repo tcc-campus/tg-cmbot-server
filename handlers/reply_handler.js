@@ -3,6 +3,7 @@
 *     1. handleReply(chatId, msgObj): Handle Telegram Message Reply
 */
 const tg_caller = require('../api_callers/telegram_caller');
+const config = require('../config');
 
 let cacheProvider = require('../cache_provider');
 
@@ -32,6 +33,13 @@ function handleFeedbackReply(chatId, firstName, msgObj) {
   const message = `Thanks ${firstName} for your feedback. I will let my developer know so I can improve! 😊`;
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result.message);
+    console.log("Sending feedback to developers");
+    const feedbackMsgForDev = `Hey Developers! Feedback received from ${firstName}:\n\n${feedbackMsg}`;
+    tg_caller.sendMessage(config.DEV_GROUP_ID, feedbackMsgForDev, {'parse_mode': 'markdown'}).then((result) => {
+      console.log(result.message);
+    }).catch((err) => {
+      console.log(err);
+    })
   }).catch((err) => {
     console.log(err);
   })
