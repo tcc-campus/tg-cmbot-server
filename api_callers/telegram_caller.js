@@ -69,7 +69,7 @@ function sendMessage(chatId, message, options) {
 function sendMessageWithReply(chatId, messageId, message, replyType) {
   console.log("Forcing reply on message to be sent: " + chatId);
 
-  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
+  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
     console.log(result);
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
     cacheProvider.instance().set(messageId, replyType, config.CACHE_DURATION, function(err, success) {
