@@ -15,7 +15,7 @@ function handleReply(chatId, msgObj) {
     console.log("Reply type detected: " + replyType);
     switch(replyType) {
       case 'feedback_reply':
-        handleFeedbackReply(chatId, firstName);
+        handleFeedbackReply(chatId, firstName, msgObj);
         break;
       default:
         console.log("Unknown reply type");
@@ -26,7 +26,9 @@ function handleReply(chatId, msgObj) {
   }
 }
 
-function handleFeedbackReply(chatId, firstName) {
+function handleFeedbackReply(chatId, firstName, msgObj) {
+  const feedbackMsg = msgObj.text;
+  console.log("Feedback received: " + feedbackMsg);
   const message = `Thanks ${firstName} for your feedback. I will let my developer know so I can improve! 😊`;
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result.message);
