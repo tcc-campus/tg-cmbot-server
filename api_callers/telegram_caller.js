@@ -2,7 +2,7 @@
 *   Exported Modules:
 *     1. setWebHook(): For setting bot webhook on Telegram Server
 *     2. sendMessage(chatId, message, options): For sending messages to Telegram chats
-*     3. sendMessageWithReply(chatId, messageId, message, replyType): For sending messages with force reply to Telegram chats
+*     3. sendMessageWithReply(chatId, message, replyType): For sending messages with force reply to Telegram chats
 */
 
 const config = require('../config');
@@ -67,15 +67,17 @@ function sendMessage(chatId, message, options) {
   });
 }
 
-function sendMessageWithReply(chatId, messageId, message, replyType) {
+function sendMessageWithReply(chatId, message, replyType) {
   console.log("Forcing reply on message to be sent: " + chatId);
 
-  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
-    console.log(result);
+  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((response) => {
+    console.log(response);
+    messageId = response.data.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
     cacheProvider.instance().set(messageId, replyType, config.CACHE_DURATION, function(err, success) {
       if (success) {
         console.log("Cache successfully set");
+        console.log("List of cache keys: " + cacheProvider.instance().keys());
       } else {
         console.log(err);
       }
