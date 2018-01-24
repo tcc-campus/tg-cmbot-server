@@ -101,7 +101,7 @@ function handleFeedback(chatId, messageId) {
 }
 
 function handleHelp(chatId) {
-  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n\/help - Get help!";
+  const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\nfeedback - Give me feedback\n/help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result);

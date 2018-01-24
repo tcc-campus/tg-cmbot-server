@@ -40,7 +40,7 @@ function sendMessage(chatId, message, options) {
   let replyMarkup = {};
   if(options) {
     parseMode = options.parse_mode ? options.parse_mode : '';
-    replyMarkup = options.force_reply ? options.force_reply : {};
+    replyMarkup = options.force_reply ? {force_reply: options.force_reply} : {};
   }
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/sendMessage`;
@@ -56,7 +56,7 @@ function sendMessage(chatId, message, options) {
       },
       json: true,
     };
-
+    console.log(JSON.stringify(options));
     request(options, function(error, response, body) {
       if(!error && response.statusCode == 200) {
         resolve('Message Sent to chat_id: ' + chatId);
