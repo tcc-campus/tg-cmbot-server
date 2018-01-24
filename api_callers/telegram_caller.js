@@ -56,10 +56,10 @@ function sendMessage(chatId, message, options) {
       },
       json: true,
     };
-    console.log(JSON.stringify(options));
     request(options, function(error, response, body) {
       if(!error && response.statusCode == 200) {
-        resolve('Message Sent to chat_id: ' + chatId);
+        const message = 'Message Sent to chat_id: ' + chatId;
+        resolve({message: message, body: body});
       } else {
         reject(error);
       }
@@ -70,9 +70,10 @@ function sendMessage(chatId, message, options) {
 function sendMessageWithReply(chatId, message, replyType) {
   console.log("Forcing reply on message to be sent: " + chatId);
 
-  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((response) => {
-    console.log(response);
-    messageId = response.data.result.message_id;
+  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
+    console.log(result.message);
+    console.log(result.body);
+    messageId = result.body.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
     cacheProvider.instance().set(messageId, replyType, config.CACHE_DURATION, function(err, success) {
       if (success) {

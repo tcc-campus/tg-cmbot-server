@@ -29,7 +29,7 @@ function handleReply(chatId, msgObj) {
 function handleFeedbackReply(chatId, firstName) {
   const message = `Thanks ${firstName} for your feedback. I will let my developer know so I can improve! 😊`;
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-    console.log(result);
+    console.log(result.message);
   }).catch((err) => {
     console.log(err);
   })

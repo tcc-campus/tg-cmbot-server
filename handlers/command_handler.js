@@ -41,7 +41,7 @@ function handleStart(chatId, firstName) {
   const message = `Hello ${firstName}! I'm Campus Ministry Bot. Type /help or click on the slash button below to know the commands you can use!`;
 
   tg_caller.sendMessage(chatId, message).then((result) => {
-    console.log(result);
+    console.log(result.message);
   }).catch((error) => {
     console.log(error);
   });
@@ -56,14 +56,14 @@ function handleSubscribe(chatId, firstName) {
   pf_caller.postSubscriber(chatId, firstName).then((result) => {
     console.log(result);
     tg_caller.sendMessage(chatId, successMessage).then((result) => {
-      console.log(result);
+      console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
   }).catch((error) => {
     console.log(error);
     tg_caller.sendMessage(chatId, failureMessage).then((result) => {
-      console.log(result);
+      console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
@@ -79,14 +79,14 @@ function handleUnsubscribe(chatId, firstName) {
   pf_caller.deleteSubscriber(chatId).then((result) => {
     console.log(result);
     tg_caller.sendMessage(chatId, successMessage).then((result) => {
-      console.log(result);
+      console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
   }).catch((error) => {
     console.log(error);
     tg_caller.sendMessage(chatId, failureMessage).then((result) => {
-      console.log(result);
+      console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
@@ -103,7 +103,7 @@ function handleHelp(chatId) {
   const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n/feedback - Give me feedback\n/help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-    console.log(result);
+    console.log(result.message);
   }).catch((error) => {
     console.log(error);
   });
@@ -112,7 +112,7 @@ function handleHelp(chatId) {
 function handleOtherCommands(chatId, message) {
 
   tg_caller.sendMessage(chatId, message).then((result) => {
-    console.log(result);
+    console.log(result.message);
   }).catch((error) => {
     console.log(error);
   });
@@ -121,7 +121,7 @@ function handleOtherCommands(chatId, message) {
 function handleUnknownCommand(chatId) {
   const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands!"
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-    console.log(result);
+    console.log(result.message);
   }).catch((error) => {
     console.log(error);
   });

@@ -20,7 +20,7 @@ function handleMessageEvent(msgObj) {
   } else {
     console.log("Echoing Message")
     tg_caller.sendMessage(chatId, text).then((result) => {
-      console.log(result);
+      console.log(result.message);
     }).catch((error) => {
       console.log(error);
     });
