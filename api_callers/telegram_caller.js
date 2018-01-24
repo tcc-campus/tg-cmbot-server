@@ -72,7 +72,6 @@ function sendMessageWithReply(chatId, message, replyType) {
 
   sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
     console.log(result.message);
-    console.log(result.body);
     messageId = result.body.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
     cacheProvider.instance().set(messageId, replyType, config.CACHE_DURATION, function(err, success) {

@@ -13,7 +13,7 @@ function handleReply(chatId, msgObj) {
   const replyType = getReplyType(replyId);
   if (replyType) {
     console.log("Reply type detected: " + replyType);
-    switch(command) {
+    switch(replyType) {
       case 'feedback_reply':
         handleFeedbackReply(chatId, firstName);
         break;
