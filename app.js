@@ -10,6 +10,7 @@ var platform = require('./routes/platform');
 
 var tgCaller = require('./api_callers/telegram_caller');
 var config = require('./config');
+let cacheProvider = require('./cache_provider');
 
 var app = express();
 
@@ -40,6 +41,15 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.send('error');
+});
+
+// start cached provider
+cacheProvider.start(function(err) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Cache provider started");
+  }
 });
 
 // setup telegram WebHook

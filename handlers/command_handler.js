@@ -9,6 +9,7 @@ const pf_caller = require('../api_callers/platform_caller');
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
   const firstName = msgObj.chat.first_name ? msgObj.chat.first_name : '';
+  const messageId = msgObj.message_id;
 
   switch(command) {
     case 'start':
@@ -23,6 +24,9 @@ function handleCommand(chatId, msgObj, command) {
       break;
     case 'unsubscribe':
       handleUnsubscribe(chatId, firstName);
+      break;
+    case 'feedback':
+      handleFeedback(chatId, messageId);
       break;
     case 'help':
       handleHelp(chatId);
@@ -90,6 +94,12 @@ function handleUnsubscribe(chatId, firstName) {
   })
 }
 
+function handleFeedback(chatId, messageId) {
+  const message = "Please let me know how I can improve by replying to this message 🙏🏻";
+  const replyType = 'feedback_reply'
+  tg_caler.sendMessageWithReply(chatId, messageId, message, replyType)
+}
+
 function handleHelp(chatId) {
   const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n\/help - Get help!";
 
@@ -111,7 +121,7 @@ function handleOtherCommands(chatId, message) {
 
 function handleUnknownCommand(chatId) {
   const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands!"
-  tg_caller.sendMessage(chatId, message).then((result) => {
+  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result);
   }).catch((error) => {
     console.log(error);
