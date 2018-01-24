@@ -87,4 +87,5 @@ function sendMessageWithReply(chatId, messageId, message, replyType) {
 module.exports = {
   setWebHook,
   sendMessage,
+  sendMessageWithReply,
 }
