@@ -97,7 +97,7 @@ function handleUnsubscribe(chatId, firstName) {
 function handleFeedback(chatId, messageId) {
   const message = "Please let me know how I can improve by replying to this message 🙏🏻";
   const replyType = 'feedback_reply'
-  tg_caler.sendMessageWithReply(chatId, messageId, message, replyType)
+  tg_caller.sendMessageWithReply(chatId, messageId, message, replyType);
 }
 
 function handleHelp(chatId) {
