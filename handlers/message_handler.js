@@ -16,7 +16,7 @@ function handleMessageEvent(msgObj) {
       console.log("Reply Detected");
       rp_handler.handleReply(chatId, msgObj);
     } else if (isCommandReceived(text)) {
-      const command = text.substr(1, text.indexOf('@'));
+      const command = text.split('@')[0].substr(1);
       console.log("Command Detected: " + command);
       cmd_handler.handleCommand(chatId, msgObj, command);
     } else {
