@@ -9,21 +9,24 @@ const rp_handler = require('./reply_handler');
 function handleMessageEvent(msgObj) {
   console.log("Handling Telegram Message Event")
   const chatId = msgObj.chat.id;
-  const text = msgObj.text.trim();
-  if (isReply(msgObj)) {
-    console.log("Reply Detected");
-    rp_handler.handleReply(chatId, msgObj);
-  } else if (isCommandReceived(text)) {
-    const command = text.substr(1);
-    console.log("Command Detected: " + command);
-    cmd_handler.handleCommand(chatId, msgObj, command);
-  } else if (text) {
-    console.log("Echoing Message")
-    tg_caller.sendMessage(chatId, text).then((result) => {
-      console.log(result.message);
-    }).catch((error) => {
-      console.log(error);
-    });
+  let text = msgObj.text;
+  if (text) {
+    text = text.trim();
+    if (isReply(msgObj)) {
+      console.log("Reply Detected");
+      rp_handler.handleReply(chatId, msgObj);
+    } else if (isCommandReceived(text)) {
+      const command = text.substr(1, text.indexOf('@'));
+      console.log("Command Detected: " + command);
+      cmd_handler.handleCommand(chatId, msgObj, command);
+    } else {
+      console.log("Echoing Message")
+      tg_caller.sendMessage(chatId, text).then((result) => {
+        console.log(result.message);
+      }).catch((error) => {
+        console.log(error);
+      });
+    }
   } else {
     console.log("Unhandled Message Event received: " + msgObj);
   }
