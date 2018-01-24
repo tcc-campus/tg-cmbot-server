@@ -52,6 +52,7 @@ function sendMessage(chatId, message, options) {
         chat_id: chatId,
         text: message,
         parse_mode: parseMode,
+        reply_markup: replyMarkup,
       },
       json: true,
     };

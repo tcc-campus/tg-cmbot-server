@@ -21,6 +21,8 @@ function handleReply(chatId, msgObj) {
         console.log("Unknown reply type");
         break;
       }
+  } else {
+    console.log("No reply found from cache key");
   }
 }
 
