@@ -31,14 +31,15 @@ function handleCallbackQueryEvent(callbackQueryObj) {
 
 function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   console.log("Handing upcoming choose month callback query");
-  const dateRange = dt_util.getDateRangeForMonth(callbackQueryData);
+  const requestedMonth = callbackQueryData
+  const dateRange = dt_util.getDateRangeForMonth(requestedMonth);
   console.log("Date range selected: " + JSON.stringify(dateRange));
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     const eventList = JSON.parse(result.body);
     console.log(eventList);
     evt_formatter.formatEventList(eventList).then(formattedEventList => {
-      msg_formatter.formatUpcomingMessage(formattedEventList).then((message) => {
+      msg_formatter.formatUpcomingMessage(formattedEventList, requestedMonth).then((message) => {
         tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
           console.log(result.message);
         }).catch((error) => {
