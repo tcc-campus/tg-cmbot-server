@@ -1,3 +1,5 @@
+moment = require('moment');
+
 function formatUpcomingMessage(formattedEventList, requestedMonth) {
   console.log("Formatting upcoming message");
   let requestedMonthString = "";
