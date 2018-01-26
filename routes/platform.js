@@ -13,4 +13,11 @@ router.post('/', function(req, res) {
   }, 3000);
 });
 
+router.post('/notify-event', function(req, res) {
+  const eventNotification = req.body;
+  console.log('Received event notification from bot platform: ', JSON.stringify(eventNotification));
+
+  res.status(200).send('Received event notification and sent to subscribers')
+})
+
 module.exports = router;

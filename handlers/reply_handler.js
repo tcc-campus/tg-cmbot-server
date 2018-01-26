@@ -34,7 +34,7 @@ function handleFeedbackReply(chatId, firstName, msgObj) {
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result.message);
     console.log("Sending feedback to developers");
-    const feedbackMsgForDev = `Hey Developers! Feedback received from ${firstName}:\n\n${feedbackMsg}`;
+    const feedbackMsgForDev = `Hey Developers! Feedback received from ${firstName}:\n\n"${feedbackMsg}"`;
     tg_caller.sendMessage(config.DEV_GROUP_ID, feedbackMsgForDev, {'parse_mode': 'markdown'}).then((result) => {
       console.log(result.message);
     }).catch((err) => {

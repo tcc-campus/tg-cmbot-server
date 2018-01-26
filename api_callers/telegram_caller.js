@@ -87,6 +87,11 @@ function sendMessageWithReply(chatId, message, replyType) {
   });
 }
 
+function sendMessageToList(chatIdList, message) {
+  console.log("Sending message to list of chatIds " + chatIdList);
+  
+}
+
 module.exports = {
   setWebHook,
   sendMessage,

@@ -5,6 +5,9 @@
 
 const tg_caller = require('../api_callers/telegram_caller');
 const pf_caller = require('../api_callers/platform_caller');
+const dt_utils = require('../utils/date_time_util');
+const evt_formatter = require('../utils/event_formatter');
+const msg_formatter = require('../utils/message_formatter');
 
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
@@ -15,8 +18,7 @@ function handleCommand(chatId, msgObj, command) {
       handleStart(chatId, firstName);
       break;
     case 'upcoming':
-      response = "I'll send you upcoming events when I have them";
-      handleOtherCommands(chatId, response);
+      handleUpcoming(chatId);
       break;
     case 'subscribe':
       handleSubscribe(chatId, firstName);
@@ -45,6 +47,22 @@ function handleStart(chatId, firstName) {
   }).catch((error) => {
     console.log(error);
   });
+}
+
+function handleUpcoming(chatId) {
+  const dateRange = utils.getDateRangeForThisMonth();
+  pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
+    console.log(result.message);
+    console.log(result.body);
+    const message = msg_formatter.formatUpcomingMessage(vt_formatter.formatEventList(result.body));
+    tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+      console.log(result.message);
+    }).catch((error) => {
+      console.log(error);
+    });
+  }).catch((error) => {
+    console.log(error);
+  })
 }
 
 function handleSubscribe(chatId, firstName) {
@@ -103,15 +121,6 @@ function handleHelp(chatId) {
   const message = "I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n/feedback - Give me feedback\n/help - Get help!";
 
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-    console.log(result.message);
-  }).catch((error) => {
-    console.log(error);
-  });
-}
-
-function handleOtherCommands(chatId, message) {
-
-  tg_caller.sendMessage(chatId, message).then((result) => {
     console.log(result.message);
   }).catch((error) => {
     console.log(error);
