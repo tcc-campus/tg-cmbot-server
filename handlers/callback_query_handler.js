@@ -1,6 +1,8 @@
 const dt_util = require('../utils/date_time_util');
 const evt_formatter = require('../utils/event_formatter');
 const msg_formatter = require('../utils/message_formatter');
+const tg_caller = require('../api_callers/telegram_caller');
+const pf_caller = require('../api_callers/platform_caller');
 
 let cacheProvider = require('../cache_provider');
 
