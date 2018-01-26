@@ -5,7 +5,7 @@
 
 const tg_caller = require('../api_callers/telegram_caller');
 const pf_caller = require('../api_callers/platform_caller');
-const dt_utils = require('../utils/date_time_util');
+const dt_util = require('../utils/date_time_util');
 const evt_formatter = require('../utils/event_formatter');
 const msg_formatter = require('../utils/message_formatter');
 
@@ -50,7 +50,8 @@ function handleStart(chatId, firstName) {
 }
 
 function handleUpcoming(chatId) {
-  const dateRange = date_time_util.getDateRangeForThisMonth();
+  const dateRange = dt_util.getDateRangeForThisMonth();
+  console.log("Date range for this month: " + dateRange);
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     console.log(result.body);
