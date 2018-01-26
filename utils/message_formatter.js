@@ -7,7 +7,7 @@ function formatUpcomingMessage(formattedEventList) {
       upcomingMessage = "Here are the list of Campus events happening this month:\n\n";
 
       for(var i = 0; i < formattedEventList.length; i++) {
-        upcomingMessage = upcomingMessage + `${i+1}. ${formattedEventList.event_name} [${formattedEventList.event_date}]\n`
+        upcomingMessage = upcomingMessage + `${i+1}. ${formattedEventList[i].event_name} [${formattedEventList[i].event_date}]\n`
       }
 
     } else {
