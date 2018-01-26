@@ -89,7 +89,7 @@ function sendMessageWithReply(chatId, message, replyType) {
   });
 }
 
-function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList) {
+function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, callbackQueryType) {
   console.log("Sending message with inline keyoard: " + chatId);
   const sendOptions = {
     'parse_mode': 'markdown',
@@ -99,6 +99,16 @@ function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList
   }
   sendMessage(chatId, message, sendOptions).then((result) => {
     console.log(result.message);
+    messageId = result.body.result.message_id;
+    console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${callbackQueryType}`)
+    cacheProvider.instance().set(messageId, callbackQueryType, config.CACHE_DURATION, function(err, success) {
+      if (success) {
+        console.log("Cache successfully set");
+        console.log("List of cache keys: " + cacheProvider.instance().keys());
+      } else {
+        console.log(err);
+      }
+    })
   }).catch((error) => {
     console.log(error);
   })

@@ -9,7 +9,7 @@ let cacheProvider = require('../cache_provider');
 
 function handleReply(chatId, msgObj) {
   const replyId = msgObj.reply_to_message.message_id;
-  const firstName = msgObj.chat.first_name ? msgObj.chat.first_name : '';
+  const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + replyId);
   const replyType = getReplyType(replyId);
   if (replyType) {

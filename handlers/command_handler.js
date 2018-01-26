@@ -5,9 +5,6 @@
 
 const tg_caller = require('../api_callers/telegram_caller');
 const pf_caller = require('../api_callers/platform_caller');
-const dt_util = require('../utils/date_time_util');
-const evt_formatter = require('../utils/event_formatter');
-const msg_formatter = require('../utils/message_formatter');
 
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
@@ -50,36 +47,19 @@ function handleStart(chatId, firstName) {
 }
 
 function handleUpcoming(chatId) {
-  // const message = "Which month of upcoming events do you want to view?";
-  const dateRange = dt_util.getDateRangeForThisMonth();
-  console.log("Date range for this month: " + JSON.stringify(dateRange));
-  pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
-    console.log(result.message);
-    const eventList = JSON.parse(result.body);
-    console.log(eventList);
-    evt_formatter.formatEventList(eventList).then(formattedEventList => {
-      msg_formatter.formatUpcomingMessage(formattedEventList).then((message) => {
-        tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-          console.log(result.message);
-        }).catch((error) => {
-          console.log(error);
-        });
-      })
-    })
-  }).catch((error) => {
-    console.log(error);
-  })
-  // const inlineKeyboardButtonList = [[
-  //   {
-  //     text: 'This Month',
-  //     callback_data: 'this_month',
-  //   },
-  //   {
-  //     text: 'Next Month',
-  //     callback_data: 'next_month',
-  //   }
-  // ]]
-  // tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList);
+  const message = "Which month of upcoming events do you want to view?";
+  const callbackQueryType = "upcoming_month_callback_query";
+  const inlineKeyboardButtonList = [[
+    {
+      text: 'This Month',
+      callback_data: 'this_month',
+    },
+    {
+      text: 'Next Month',
+      callback_data: 'next_month',
+    }
+  ]]
+  tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, callbackQueryType);
 }
 
 function handleSubscribe(chatId, firstName) {
