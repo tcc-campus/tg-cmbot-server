@@ -1,7 +1,7 @@
 const moment = require('moment');
 
 function formatEventList(eventList) {
-  console.log("Formatting Event List");
+  console.log("Formatting Event List with " + eventList.length + " events");
   let formattedEventList = [];
   for (var i = 0; i < eventList.length; i++) {
     var startDateTimeObj = moment(eventList[i].start.dateTime);

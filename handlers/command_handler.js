@@ -55,6 +55,7 @@ function handleUpcoming(chatId) {
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     const eventList = result.body;
+    console.log(eventList);
     if (eventList.length > 0) {
       const message = msg_formatter.formatUpcomingMessage(evt_formatter.formatEventList(result.body));
     } else {
