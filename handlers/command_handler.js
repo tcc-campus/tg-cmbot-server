@@ -56,7 +56,7 @@ function handleUpcoming(chatId) {
     console.log(result.message);
     const eventList = result.body;
     console.log(eventList);
-    for (var=i; i<eventList.length; i++) {
+    for (var i=0; i<eventList.length; i++) {
       console.log(eventList[i]);
     }
     if (eventList.length > 0) {
