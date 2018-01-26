@@ -11,8 +11,8 @@ function getDateRangeForMonth(month) {
       break;
     case 'next_month':
       dateRange = {
-        start_date: moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD'),
-        end_date: moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD')
+        start_date: moment().add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+        end_date: moment().add(1, 'month').endOf('month').format('YYYY-MM-DD')
       }
       break;
     default:

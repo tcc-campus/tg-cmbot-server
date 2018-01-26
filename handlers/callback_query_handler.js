@@ -30,7 +30,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
 function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   console.log("Handing upcoming choose month callback query");
   const dateRange = dt_util.getDateRangeForMonth(callbackQueryData);
-  console.log("Date range for this month: " + JSON.stringify(dateRange));
+  console.log("Date range selected: " + JSON.stringify(dateRange));
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     const eventList = JSON.parse(result.body);
