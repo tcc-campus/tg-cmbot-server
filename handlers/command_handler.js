@@ -54,8 +54,12 @@ function handleUpcoming(chatId) {
   console.log("Date range for this month: " + JSON.stringify(dateRange));
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
-    console.log(result.body);
-    const message = msg_formatter.formatUpcomingMessage(evt_formatter.formatEventList(result.body));
+    const eventList = result.body;
+    if (eventList.length > 0) {
+      const message = msg_formatter.formatUpcomingMessage(evt_formatter.formatEventList(result.body));
+    } else {
+      const message = "There are no upcoming events this month!";
+    }
     tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
       console.log(result.message);
     }).catch((error) => {
