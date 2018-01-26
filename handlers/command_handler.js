@@ -51,11 +51,11 @@ function handleStart(chatId, firstName) {
 
 function handleUpcoming(chatId) {
   const dateRange = dt_util.getDateRangeForThisMonth();
-  console.log("Date range for this month: " + dateRange);
+  console.log("Date range for this month: " + JSON.stringify(dateRange));
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     console.log(result.body);
-    const message = msg_formatter.formatUpcomingMessage(vt_formatter.formatEventList(result.body));
+    const message = msg_formatter.formatUpcomingMessage(evt_formatter.formatEventList(result.body));
     tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
       console.log(result.message);
     }).catch((error) => {
