@@ -7,7 +7,7 @@ let cacheProvider = require('../cache_provider');
 function handleCallbackQueryEvent(callbackQueryObj) {
   console.log("Handling Telegram Callback Query Event");
   console.log(callbackQueryObj);
-  const messageId = callbackQueryObj.message.id;
+  const messageId = callbackQueryObj.message.message_id;
   const chatId = callbackQueryObj.chat.id;
   const firstName = callbackQueryObj.chat.first_name;
   const callbackQueryData = callbackQueryObj.data;
