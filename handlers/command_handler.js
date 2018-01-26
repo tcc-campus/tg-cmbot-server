@@ -50,7 +50,7 @@ function handleStart(chatId, firstName) {
 }
 
 function handleUpcoming(chatId) {
-  const dateRange = utils.getDateRangeForThisMonth();
+  const dateRange = date_time_util.getDateRangeForThisMonth();
   pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
     console.log(result.message);
     console.log(result.body);
