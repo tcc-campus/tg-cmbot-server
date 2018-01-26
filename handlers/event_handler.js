@@ -4,6 +4,7 @@
 */
 
 const msg_handler = require('./message_handler');
+const cq_handler = require('./callback_query_handler');
 
 function handleTgEvent(eventObj) {
   console.log("Handling Telegram Event");
@@ -19,6 +20,8 @@ function handleTgEvent(eventObj) {
       console.log("inline_query event detected");
   } else if (eventObj.chosen_inline_result) {
       console.log("chosen_inline_result event detected");
+  } else if (eventObj.callback_query) {
+      cq_handler.handleCallbackQueryEvent(eventObj.callback_query);
   } else {
       console.log("unknown event detected");
   }
