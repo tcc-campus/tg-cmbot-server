@@ -39,8 +39,9 @@ function sendMessage(chatId, message, options) {
   let parseMode = '';
   let replyMarkup = {};
   if(options) {
-    parseMode = options.parse_mode ? options.parse_mode : '';
-    replyMarkup = options.force_reply ? {force_reply: options.force_reply} : {};
+    parseMode = options.parse_mode || '';
+    replyMarkup = options.force_reply || options.inline_keyboard || {};
+
   }
   return new Promise(function(resolve, reject) {
     const url = `${config.TELEGRAM_API_URL}/sendMessage`;
@@ -56,6 +57,7 @@ function sendMessage(chatId, message, options) {
       },
       json: true,
     };
+
     request(options, function(error, response, body) {
       if(!error && response.statusCode == 200) {
         const message = 'Message Sent to chat_id: ' + chatId;
@@ -70,7 +72,7 @@ function sendMessage(chatId, message, options) {
 function sendMessageWithReply(chatId, message, replyType) {
   console.log("Forcing reply on message to be sent: " + chatId);
 
-  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': true}).then((result) => {
+  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': {'force_reply': true}}).then((result) => {
     console.log(result.message);
     messageId = result.body.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
@@ -87,9 +89,25 @@ function sendMessageWithReply(chatId, message, replyType) {
   });
 }
 
+function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList) {
+  console.log("Sending message with inline keyoard: " + chatId);
+  const sendOptions = {
+    'parse_mode': 'markdown',
+    'inline_keyboard' : {
+      'inline_keyboard': inlineKeyboardButtonList,
+    }
+  }
+  sendMessage(chatId, message, sendOptions).then((result) => {
+    console.log(result.message);
+  }).catch((error) => {
+    console.log(error);
+  })
+}
+
+
 function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
-  
+
 }
 
 module.exports = {
