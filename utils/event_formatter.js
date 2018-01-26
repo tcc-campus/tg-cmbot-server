@@ -20,7 +20,7 @@ function formatEventList(eventList) {
   return new Promise(function(resolve, reject) {
     let formattedEventList = [];
     for (var i = 0; i < eventList.length; i++) {
-      formatEventList.push(formatEvent(eventList[i]));
+      formattedEventList.push(formatEvent(eventList[i]));
     }
     resolve(formattedEventList);
   });
