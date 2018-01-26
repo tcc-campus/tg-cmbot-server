@@ -1,8 +1,13 @@
 /* Modules to make API Calls to Telegram Server
 *   Exported Modules:
 *     1. setWebHook(): For setting bot webhook on Telegram Server
-*     2. sendMessage(chatId, message, options): For sending messages to Telegram chats
-*     3. sendMessageWithReply(chatId, message, replyType): For sending messages with force reply to Telegram chats
+*     2. sendMessage(chatId, message, options): For sending messages to Telegram
+*        chats
+*     3. sendMessageWithReply(chatId, message, replyType): For sending messages
+*        with force reply to Telegram chats
+*     4. sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList,
+*        callbackQueryType): For sending messages with inline keyboard to telegram
+*        chats
 */
 
 const config = require('../config');

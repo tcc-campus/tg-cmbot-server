@@ -1,3 +1,8 @@
+/* Modules to handle callback query events from Telegram
+*   Exported Modules:
+*     1. handleCallbackQueryEvent(callbackQueryObj): Handle Telegram Callback Query Event
+*/
+
 const dt_util = require('../utils/date_time_util');
 const evt_formatter = require('../utils/event_formatter');
 const msg_formatter = require('../utils/message_formatter');

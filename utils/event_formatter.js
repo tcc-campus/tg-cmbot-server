@@ -1,3 +1,10 @@
+/* Modules to format Campus events
+*   Exported Modules:
+*     1. formatEvent(event): For formatting a single campus event into JSON obj
+*     2. formatEventList(eventList): For formatting a list of campus events into
+*        an array of JSON obj
+*/
+
 const moment = require('moment');
 
 function formatEvent(event) {

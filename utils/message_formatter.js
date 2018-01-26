@@ -1,3 +1,9 @@
+/* Modules to format messages
+*   Exported Modules:
+*     1. formatUpcomingMessage(formattedEventList, requestedMonth): For formatting
+*        messages for the /upcoming command
+*/
+
 moment = require('moment');
 
 function formatUpcomingMessage(formattedEventList, requestedMonth) {
