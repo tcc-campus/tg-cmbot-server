@@ -5,11 +5,11 @@
 *        an array of JSON obj
 */
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 function formatEvent(event) {
-  var startDateTimeObj = moment(event.start.dateTime);
-  var endDateTimeObj = moment(event.end.dateTime);
+  var startDateTimeObj = moment.tz(event.start.dateTime, "Asia/Singapore");
+  var endDateTimeObj = moment.tz(event.end.dateTime, "Asia/Singapore");
   return {
     event_name: event.summary,
     event_message: event.description,
