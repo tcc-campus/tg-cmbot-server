@@ -2,6 +2,7 @@
 *   Exported Modules:
 *     1. formatUpcomingMessage(formattedEventList, requestedMonth): For formatting
 *        messages for the /upcoming command
+*     2. formatEventDetail(eventObj): For formatting message for event detail
 */
 
 moment = require('moment');
@@ -37,6 +38,18 @@ function formatUpcomingMessage(formattedEventList, requestedMonth) {
   });
 }
 
+function formatEventDetail(eventObj) {
+  let eventDetailMessage = "";
+  if (eventObj.event_message) {
+    eventDetailMessage += eventObj.event_message + "\n\n";
+  }
+  eventDetailMessage += `**Details:**\nEvent Name: ${eventObj.event_name}\nDate: ${eventObj.event_date}\nTime: ${eventObj.event_timing.start_time} to ${eventObj.event_timing.end_time}\n\n`;
+  eventDetailMessage += "See you there!";
+
+  return eventDetailMessage;
+}
+
 module.exports = {
   formatUpcomingMessage,
+  formatEventDetail,
 }

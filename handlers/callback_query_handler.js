@@ -24,8 +24,11 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   if (callbackQueryType) {
     console.log("Callback query type detected: " + callbackQueryType);
     switch(callbackQueryType) {
-      case 'upcoming_month_callback_query':
-        handleUpcomingMonthCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
+      case c_util.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
+        handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
+        break;
+      case c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
+        handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
         break;
       default:
         console.log("Unknown callback query type");
@@ -36,7 +39,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   }
 }
 
-function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData) {
+function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   console.log("Handing upcoming choose month callback query");
   const requestedMonth = callbackQueryData
   const dateRange = dt_util.getDateRangeForMonth(requestedMonth);
@@ -62,12 +65,29 @@ function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData, callbackQue
   })
 }
 
+function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData) {
+  console.log("Handling upcoming event detail callback query");
+  const requestedEventIndex = callbackQueryData;
+  const eventList = callbackQueryCacheData;
+  const message = msg_formatter.formatEventDetail(eventList[requestedEventIndex]);
+  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+    console.log(result.message);
+  }).catch((error) => {
+    console.log(error);
+  })
+}
+
 function getEventDetailInlineKeyboard(listSize) {
-  const inlineKeyboardButtonList = [[]];
+  const inlineKeyboardButtonList = [];
   console.log("Getting event detail inline keyboard object for event list size: " + listSize);
   return new Promise(function(resolve, reject) {
+    let rowIndex = -1;
     for (var i=0; i<listSize; i++) {
-      inlineKeyboardButtonList[0].push({
+      if (i%5 === 0) {
+        inlineKeyboardButtonList.push([]);
+        rowIndex += 1;
+      }
+      inlineKeyboardButtonList[rowIndex].push({
         text: i+1,
         callback_data: i,
       })

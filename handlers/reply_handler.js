@@ -17,7 +17,7 @@ function handleReply(chatId, msgObj) {
   if (replyType) {
     console.log("Reply type detected: " + replyType);
     switch(replyType) {
-      case 'feedback_reply':
+      case c_util.REPLY_TYPE.FEEDBACK:
         handleFeedbackReply(chatId, firstName, msgObj);
         break;
       default:
