@@ -4,14 +4,15 @@
 */
 const tg_caller = require('../api_callers/telegram_caller');
 const config = require('../config');
-
-let cacheProvider = require('../cache_provider');
+const c_util = require('../utils/cache_util');
 
 function handleReply(chatId, msgObj) {
   const replyId = msgObj.reply_to_message.message_id;
   const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + replyId);
-  const replyType = getReplyType(replyId);
+  const cacheObj = getCacheObj(replyId);
+  const replyType = cacheObj.type;
+  const replyCacheData = cacheObj.data;
   if (replyType) {
     console.log("Reply type detected: " + replyType);
     switch(replyType) {
@@ -43,11 +44,6 @@ function handleFeedbackReply(chatId, firstName, msgObj) {
   }).catch((err) => {
     console.log(err);
   })
-}
-
-function getReplyType(replyId) {
-  console.log("Getting reply type with cache key: " + replyId);
-  return cacheProvider.instance().get(replyId);
 }
 
 module.exports = {

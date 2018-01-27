@@ -5,7 +5,7 @@
 
 const tg_caller = require('../api_callers/telegram_caller');
 const pf_caller = require('../api_callers/platform_caller');
-const cache_config = require('../configs/cache_config');
+const c_util = require('../utils/cache_util');
 
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
@@ -59,7 +59,7 @@ function handleUpcoming(chatId) {
       callback_data: 'next_month',
     }
   ]]
-  tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, cache_config.CALLBACK_QUERY_TYPE.UPCOMING_MONTH);
+  tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, c_util.CALLBACK_QUERY_TYPE.UPCOMING_MONTH);
 }
 
 function handleSubscribe(chatId, firstName) {
@@ -110,7 +110,7 @@ function handleUnsubscribe(chatId, firstName) {
 
 function handleFeedback(chatId) {
   const message = "Please let me know how I can improve by replying to this message 🙏🏻";
-  tg_caller.sendMessageWithReply(chatId, message, cache_config.REPLY_TYPE.FEEDBACK);
+  tg_caller.sendMessageWithReply(chatId, message, c_util.REPLY_TYPE.FEEDBACK);
 }
 
 function handleHelp(chatId) {

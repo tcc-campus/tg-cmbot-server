@@ -4,12 +4,11 @@
 */
 
 const dt_util = require('../utils/date_time_util');
+const c_util = require('../utils/cache_util');
 const evt_formatter = require('../utils/event_formatter');
 const msg_formatter = require('../utils/message_formatter');
 const tg_caller = require('../api_callers/telegram_caller');
 const pf_caller = require('../api_callers/platform_caller');
-
-let cacheProvider = require('../cache_provider');
 
 function handleCallbackQueryEvent(callbackQueryObj) {
   console.log("Handling Telegram Callback Query Event");
@@ -18,7 +17,9 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   const firstName = callbackQueryObj.message.chat.first_name;
   const callbackQueryData = callbackQueryObj.data;
 
-  const callbackQueryType = getCallbackQueryType(messageId);
+  const cacheObj = c_util.getCacheObj(messageId)
+  const callbackQueryType = cacheObj.type;
+  const callbackQueryCacheData = cacheObj.data;
   if (callbackQueryType) {
     console.log("Callback query type detected: " + callbackQueryType);
     switch(callbackQueryType) {
@@ -60,11 +61,6 @@ function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   }).catch((error) => {
     console.log(error);
   })
-}
-
-function getCallbackQueryType(messageId) {
-  console.log("Getting callback query type with cache key: " + messageId);
-  return cacheProvider.instance().get(messageId);
 }
 
 module.exports = {
