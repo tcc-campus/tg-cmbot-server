@@ -75,14 +75,18 @@ function sendMessage(chatId, message, options) {
   });
 }
 
-function sendMessageWithReply(chatId, message, replyType) {
+function sendMessageWithReply(chatId, message, replyType, replyTypeData) {
   console.log("Forcing reply on message to be sent: " + chatId);
 
   sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': {'force_reply': true}}).then((result) => {
     console.log(result.message);
     messageId = result.body.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
-    cacheProvider.instance().set(messageId, replyType, config.CACHE_DURATION, function(err, success) {
+    const cacheValue = {
+      type: replyType,
+      data: replyTypeData,
+    }
+    cacheProvider.instance().set(messageId, cacheValue, config.CACHE_DURATION, function(err, success) {
       if (success) {
         console.log("Cache successfully set");
         console.log("List of cache keys: " + cacheProvider.instance().keys());
@@ -95,7 +99,7 @@ function sendMessageWithReply(chatId, message, replyType) {
   });
 }
 
-function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, callbackQueryType) {
+function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, callbackQueryType, callbackQueryTypeValue) {
   console.log("Sending message with inline keyoard: " + chatId);
   const sendOptions = {
     'parse_mode': 'markdown',
@@ -107,7 +111,11 @@ function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList
     console.log(result.message);
     messageId = result.body.result.message_id;
     console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${callbackQueryType}`)
-    cacheProvider.instance().set(messageId, callbackQueryType, config.CACHE_DURATION, function(err, success) {
+    const cacheValue = {
+      type: callbackQueryType,
+      data: callbackQueryTypeValue,
+    }
+    cacheProvider.instance().set(messageId, cacheValue, config.CACHE_DURATION, function(err, success) {
       if (success) {
         console.log("Cache successfully set");
         console.log("List of cache keys: " + cacheProvider.instance().keys());
