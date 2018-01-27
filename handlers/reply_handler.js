@@ -10,7 +10,8 @@ function handleReply(chatId, msgObj) {
   const replyId = msgObj.reply_to_message.message_id;
   const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + replyId);
-  const cacheObj = getCacheObj(replyId);
+  const cacheObj = c_util.getCacheObj(replyId);
+  console.log("Cache Object: " + JSON.stringify(cacheObj));
   const replyType = cacheObj.type;
   const replyCacheData = cacheObj.data;
   if (replyType) {

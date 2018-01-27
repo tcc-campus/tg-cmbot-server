@@ -28,7 +28,7 @@ function formatUpcomingMessage(formattedEventList, requestedMonth) {
       for(var i = 0; i < formattedEventList.length; i++) {
         upcomingMessage = upcomingMessage + `${i+1}. ${formattedEventList[i].event_name} - ${formattedEventList[i].event_date}\n`
       }
-      upcomingMessage = upcomingMessage + "\nPlease select the corresponding numbers below to get more details on each event!"
+      upcomingMessage = upcomingMessage + "\nPlease select the corresponding numbers below to get more details on each event:"
 
     } else {
       upcomingMessage = `There are no upcoming events in ${requestedMonthString}!`;

@@ -18,13 +18,14 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   const callbackQueryData = callbackQueryObj.data;
 
   const cacheObj = c_util.getCacheObj(messageId)
+  console.log("Cache Object: " + JSON.stringify(cacheObj));
   const callbackQueryType = cacheObj.type;
   const callbackQueryCacheData = cacheObj.data;
   if (callbackQueryType) {
     console.log("Callback query type detected: " + callbackQueryType);
     switch(callbackQueryType) {
       case 'upcoming_month_callback_query':
-        handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
+        handleUpcomingMonthCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
         break;
       default:
         console.log("Unknown callback query type");
@@ -35,7 +36,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   }
 }
 
-function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
+function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData) {
   console.log("Handing upcoming choose month callback query");
   const requestedMonth = callbackQueryData
   const dateRange = dt_util.getDateRangeForMonth(requestedMonth);
@@ -48,11 +49,9 @@ function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
       console.log(eventList);
       evt_formatter.formatEventList(eventList).then(formattedEventList => {
         msg_formatter.formatUpcomingMessage(formattedEventList, requestedMonth).then((message) => {
-          tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-            console.log(result.message);
-          }).catch((error) => {
-            console.log(error);
-          });
+          getEventDetailInlineKeyboard(formattedEventList.length).then((inlineKeyboardButtonList) => {
+            tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL, formattedEventList);
+          })
         })
       })
     }).catch((error) => {
@@ -61,6 +60,20 @@ function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   }).catch((error) => {
     console.log(error);
   })
+}
+
+function getEventDetailInlineKeyboard(listSize) {
+  const inlineKeyboardButtonList = [[]];
+  console.log("Getting event detail inline keyboard object for event list size: " + listSize);
+  return new Promise(function(resolve, reject) {
+    for (var i=0; i<listSize; i++) {
+      inlineKeyboardButtonList[0].push({
+        text: i+1,
+        callback_data: i,
+      })
+    }
+    resolve(inlineKeyboardButtonList);
+  });
 }
 
 module.exports = {

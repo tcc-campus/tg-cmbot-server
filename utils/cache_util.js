@@ -5,7 +5,8 @@ const REPLY_TYPE = {
 }
 
 const CALLBACK_QUERY_TYPE = {
-  UPCOMING_MONTH: 'upcoming_month_callback_query'
+  UPCOMING_MONTH: 'upcoming_month_callback_query',
+  UPCOMING_EVENT_DETAIL: 'upcoming_event_detail_callback_query',
 }
 
 function getCacheObj(cacheKey) {
