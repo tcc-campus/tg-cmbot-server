@@ -43,8 +43,11 @@ function formatEventDetail(eventObj) {
   if (eventObj.event_message) {
     eventDetailMessage += eventObj.event_message + "\n\n";
   }
-  eventDetailMessage += `*Details:*\nEvent Name: ${eventObj.event_name}\nDate: ${eventObj.event_date}\nTime: ${eventObj.event_timing.start_time} to ${eventObj.event_timing.end_time}\n\n`;
-  eventDetailMessage += "See you there!";
+  eventDetailMessage += `*Details:*\nEvent Name: ${eventObj.event_name}\nDate: ${eventObj.event_date}\nTime: ${eventObj.event_timing.start_time} to ${eventObj.event_timing.end_time}\n`;
+  if (eventObj.event_location) {
+    eventDetailMessage += `Location: ${eventObj.event_location}\n`;
+  }
+  eventDetailMessage += "\nSee you there!";
 
   return eventDetailMessage;
 }
