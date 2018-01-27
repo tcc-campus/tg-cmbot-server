@@ -26,7 +26,7 @@ function formatUpcomingMessage(formattedEventList, requestedMonth) {
       upcomingMessage = `Here are the list of Campus events happening in ${requestedMonthString}:\n\n`;
 
       for(var i = 0; i < formattedEventList.length; i++) {
-        upcomingMessage = upcomingMessage + `${i+1}. ${formattedEventList[i].event_name} [${formattedEventList[i].event_date}]\n`
+        upcomingMessage = upcomingMessage + `${i+1}. ${formattedEventList[i].event_name} - ${formattedEventList[i].event_date}\n`
       }
 
     } else {

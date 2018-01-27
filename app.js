@@ -59,4 +59,9 @@ tgCaller.setWebHook().then((result) => {
   console.log(error);
 });
 
+// prevent timeout
+setInterval(function() {
+    http.get(process.env.PUBLIC_URL);
+}, 600000); //
+
 module.exports = app;

@@ -8,6 +8,7 @@
 *     4. sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList,
 *        callbackQueryType): For sending messages with inline keyboard to telegram
 *        chats
+*     5. sendChatAction(chatId, action): For sending chat actions to telegram user
 */
 
 const config = require('../config');
@@ -119,6 +120,32 @@ function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList
   })
 }
 
+function sendChatAction(chatId, action) {
+  console.log(`Sending chat action (${action}) to chat_id: ${chatId}`);
+  return new Promise(function(resolve, reject) {
+    const url = `${config.TELEGRAM_API_URL}/sendChatAction`;
+    const options = {
+      method: 'post',
+      url: url,
+      headers: {'content-type': 'application/json' },
+      body: {
+        chat_id: chatId,
+        action: action,
+      },
+      json: true,
+    };
+
+    request(options, function(error, response, body) {
+      if(!error && response.statusCode == 200) {
+        const message = 'Chat action sent to chat_id: ' + chatId;
+        resolve(message);
+      } else {
+        reject(error);
+      }
+    });
+  });
+}
+
 
 function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
@@ -130,4 +157,5 @@ module.exports = {
   sendMessage,
   sendMessageWithReply,
   sendMessageWithInlineKeyboard,
+  sendChatAction,
 }
