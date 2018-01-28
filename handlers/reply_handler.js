@@ -11,22 +11,27 @@ function handleReply(chatId, msgObj) {
   const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + replyId);
   const cacheObj = c_util.getCacheObj(replyId);
-  console.log("Cache Object: " + JSON.stringify(cacheObj));
-  const replyType = cacheObj.type;
-  const replyCacheData = cacheObj.data;
-  if (replyType) {
-    console.log("Reply type detected: " + replyType);
-    switch(replyType) {
-      case c_util.REPLY_TYPE.FEEDBACK:
-        handleFeedbackReply(chatId, firstName, msgObj);
-        break;
-      default:
-        console.log("Unknown reply type");
-        break;
-      }
+  if (cacheObj) {
+    console.log("Cache Object: " + JSON.stringify(cacheObj));
+    const replyType = cacheObj.type;
+    const replyCacheData = cacheObj.data;
+    if (replyType) {
+      console.log("Reply type detected: " + replyType);
+      switch(replyType) {
+        case c_util.REPLY_TYPE.FEEDBACK:
+          handleFeedbackReply(chatId, firstName, msgObj);
+          break;
+        default:
+          console.log("Unknown reply type");
+          break;
+        }
+    } else {
+      console.log("No reply found from cache key");
+    }
   } else {
-    console.log("No reply found from cache key");
+    console.log("Cache key-value doesn't exist!");
   }
+
 }
 
 function handleFeedbackReply(chatId, firstName, msgObj) {

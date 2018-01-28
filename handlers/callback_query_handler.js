@@ -18,25 +18,30 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   const callbackQueryData = callbackQueryObj.data;
 
   const cacheObj = c_util.getCacheObj(messageId)
-  console.log("Cache Object: " + JSON.stringify(cacheObj));
-  const callbackQueryType = cacheObj.type;
-  const callbackQueryCacheData = cacheObj.data;
-  if (callbackQueryType) {
-    console.log("Callback query type detected: " + callbackQueryType);
-    switch(callbackQueryType) {
-      case c_util.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
-        handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
-        break;
-      case c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
-        handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
-        break;
-      default:
-        console.log("Unknown callback query type");
-        break;
-      }
+  if (cacheObj) {
+    console.log("Cache Object: " + JSON.stringify(cacheObj));
+    const callbackQueryType = cacheObj.type;
+    const callbackQueryCacheData = cacheObj.data;
+    if (callbackQueryType) {
+      console.log("Callback query type detected: " + callbackQueryType);
+      switch(callbackQueryType) {
+        case c_util.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
+          handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
+          break;
+        case c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
+          handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
+          break;
+        default:
+          console.log("Unknown callback query type");
+          break;
+        }
+    } else {
+      console.log("No callback query found from cache key");
+    }
   } else {
-    console.log("No callback query found from cache key");
+    console.log("No cache key-value found from cache kdy");
   }
+
 }
 
 function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
