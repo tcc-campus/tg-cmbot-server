@@ -12,9 +12,14 @@ function handleEventNotification(eventNotification) {
     const eventDetails = eventNotification.event_details;
     console.log("Formating event detail");
     const message = msg_formatter.formatEventDetail(eventDetails);
-    tg_caller.sendMessageToList(subscriberList, message).then((result) => {
-      console.log(result);
-      resolve(result)
+    tg_caller.sendMessageToList(subscriberList, message).then((resultList) => {
+      console.log(resultList);
+      const errorList = resultList.filter((result) => !result.message);
+      if (errorList.length > 0) {
+        reject(`${errorList.length}/${subscriberList.length} messages failed to be sent: ${errorList}`);
+      } else {
+        resolve("All messages successfully sent");
+      }
     }).catch((error) => {
       reject(error);
     })
