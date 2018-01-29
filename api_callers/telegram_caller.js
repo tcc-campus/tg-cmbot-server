@@ -169,8 +169,8 @@ function sendMessageToList(chatIdList, message) {
     Promise.all(sendMessageTaskList).then((result) => {
       resolve("Message sent to all chatIds")
     }).catch((error) => {
-      console.log("Sending message to list encountered the following error: " + JSON.stringify(error));
-      reject(error);
+      console.log("One of the messages to be sent encountered an error: ", error);
+      reject(sendMessageTaskList);
     })
   });
 }
