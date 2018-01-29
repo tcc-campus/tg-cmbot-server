@@ -2,15 +2,21 @@
 *   Exported Modules:
 *     1. handleEventNotification(eventNotification): Handle
 */
-const pf_caller = require('../api_callers/platform_caller');
+const tg_caller = require('../api_callers/telegram_caller');
+const msg_formatter = require('../utils/message_formatter');
 
 function handleEventNotification(eventNotification) {
   console.log("Handing event notification from bot platform");
   return new Promise(function(resolve, reject) {
     const subscriberList = eventNotification.subscriber_list;
     const eventDetails = eventNotification.event_details;
-    const message = formatEventNotificationMessage(eventDetails);
-    
+    console.log("Formating event detail");
+    const message = msg_formatter.formatEventDetail(eventDetails);
+    tg_caller.sendMessageToList(subscriberList, message).then((result) => {
+      resolve(result)
+    }).catch((error) => {
+      reject(error);
+    })
   });
 }
 

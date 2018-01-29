@@ -69,7 +69,7 @@ function sendMessage(chatId, message, options) {
         const message = 'Message Sent to chat_id: ' + chatId;
         resolve({message: message, body: body});
       } else {
-        reject(error);
+        reject("Failed to send message to " + chatId + ": " + error);
       }
     });
   });
@@ -157,7 +157,19 @@ function sendChatAction(chatId, action) {
 
 function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
-
+  return new Promise(function(resolve, reject) {
+    let successCounter = 0;
+    let sendMessageTaskList = [];
+    let errorList = [];
+    for(var i = 0; i < chatIdList.length; i++) {
+      sendMessageTaskList.push(sendMessage(chatIdList[i], message, {'parse_mode': 'markdown'}));
+      }
+    Promise.all(sendMessageTaskList).then((result) => {
+      resolve("Message sent to all chatIds")
+    }).catch((error) => {
+      reject(error);
+    })
+  });
 }
 
 module.exports = {
@@ -165,5 +177,6 @@ module.exports = {
   sendMessage,
   sendMessageWithReply,
   sendMessageWithInlineKeyboard,
+  sendMessageToList,
   sendChatAction,
 }
