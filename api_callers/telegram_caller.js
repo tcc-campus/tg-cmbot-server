@@ -65,12 +65,14 @@ function sendMessage(chatId, message, options) {
     };
 
     request(options, function(error, response, body) {
-      if(!error && response.statusCode == 200) {
-        const message = 'Message Sent to chat_id: ' + chatId;
-        resolve({message: message, body: body});
-      } else {
-        reject("Failed to send message to " + chatId + ": " + error);
-      }
+      setTimeout(() => {
+        if(!error && response.statusCode == 200) {
+          const message = 'Message Sent to chat_id: ' + chatId;
+          resolve({message: message, body: body});
+        } else {
+          reject("Failed to send message to " + chatId + ": " + error);
+        }
+      }, 200);
     });
   });
 }
@@ -167,6 +169,7 @@ function sendMessageToList(chatIdList, message) {
     Promise.all(sendMessageTaskList).then((result) => {
       resolve("Message sent to all chatIds")
     }).catch((error) => {
+      console.log("Sending message to list encountered the following error: " + JSON.stringify(error));
       reject(error);
     })
   });
