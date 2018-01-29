@@ -16,7 +16,9 @@ function handleEventNotification(eventNotification) {
       console.log(resultList);
       const errorList = resultList.filter((result) => !result.message);
       if (errorList.length > 0) {
-        reject(`${errorList.length}/${subscriberList.length} messages failed to be sent: ${errorList}`);
+        const errMessage = `${errorList.length}/${subscriberList.length} messages failed to be sent: ${errorList}`;
+        console.log(errMessage);
+        reject(errMessage);
       } else {
         resolve("All messages successfully sent");
       }

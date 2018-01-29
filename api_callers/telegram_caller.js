@@ -164,7 +164,8 @@ function sendMessageToList(chatIdList, message) {
         sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
           resolve(result);
         }).catch((error) => {
-          reject(("Error: " + error));
+          console.log(error);
+          reject(chatId);
         })
       });
     });
