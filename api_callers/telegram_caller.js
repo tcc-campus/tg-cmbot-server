@@ -70,7 +70,7 @@ function sendMessage(chatId, message, options) {
           const message = 'Message Sent to chat_id: ' + chatId;
           resolve({message: message, body: body});
         } else {
-          reject("Error: Failed to send message to " + chatId + ": " + error);
+          reject("Failed to send message to " + chatId + ": " + error);
         }
       }, 200);
     });
@@ -156,12 +156,17 @@ function sendChatAction(chatId, action) {
   });
 }
 
-
 function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
   return new Promise(function(resolve, reject) {
     let sendMessageTaskList = chatIdList.map((chatId) => {
-      sendMessage(chatId, message, {'parse_mode': 'markdown'});
+      return new Promise(function(resolve, reject) {
+        sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+          resolve(result);
+        }).catch((error) => {
+          reject(("Error: " + error));
+        })
+      });
     });
 
     Promise.all(sendMessageTaskList.map(p => p.catch(err => err))).then((result) => {
