@@ -70,7 +70,7 @@ function sendMessage(chatId, message, options) {
           const message = 'Message Sent to chat_id: ' + chatId;
           resolve({message: message, body: body});
         } else {
-          reject("Failed to send message to " + chatId + ": " + error);
+          reject("Error: Failed to send message to " + chatId + ": " + error);
         }
       }, 200);
     });
@@ -160,17 +160,16 @@ function sendChatAction(chatId, action) {
 function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
   return new Promise(function(resolve, reject) {
-    let successCounter = 0;
-    let sendMessageTaskList = [];
-    let errorList = [];
-    for(var i = 0; i < chatIdList.length; i++) {
-      sendMessageTaskList.push(sendMessage(chatIdList[i], message, {'parse_mode': 'markdown'}));
-      }
-    Promise.all(sendMessageTaskList).then((result) => {
-      resolve("Message sent to all chatIds")
+    let sendMessageTaskList = chatIdList.map((chatId) => {
+      sendMessage(chatId, message, {'parse_mode': 'markdown'});
+    });
+
+    Promise.all(sendMessageTaskList.map(p => p.catch(err => err))).then((result) => {
+      console.log("Message sending task completed");
+      resolve(result);
     }).catch((error) => {
-      console.log("One of the messages to be sent encountered an error: ", error);
-      reject(sendMessageTaskList);
+      console.log(error);
+      reject(error);
     })
   });
 }

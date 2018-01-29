@@ -13,6 +13,7 @@ function handleEventNotification(eventNotification) {
     console.log("Formating event detail");
     const message = msg_formatter.formatEventDetail(eventDetails);
     tg_caller.sendMessageToList(subscriberList, message).then((result) => {
+      console.log(result);
       resolve(result)
     }).catch((error) => {
       reject(error);
