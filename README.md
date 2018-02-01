@@ -26,5 +26,5 @@ Telegram Bot Server for TCC Campus Ministry Bot
    
 ### Design
 
-<img src="docs/diagrams/Architecture" width="600"><br>
+<img src="docs/diagrams/Architecture.png" width="600"><br>
 The **_Architecture Diagram_** given above explains the high-level design of the Telegram bot server.
