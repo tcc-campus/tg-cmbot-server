@@ -31,8 +31,7 @@ function handleCommand(chatId, msgObj, command) {
       handleHelp(chatId);
       break;
     default:
-      response = "Oops sorry, I don't understand the command. Type /help to get a list of available commands 😁"
-      handleUnknownCommand(chatId, response);
+      handleUnknownCommand(chatId);
       break;
   }
 }
@@ -124,7 +123,7 @@ function handleHelp(chatId) {
 }
 
 function handleUnknownCommand(chatId) {
-  const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands!"
+  const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands! 😁"
   tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result.message);
   }).catch((error) => {

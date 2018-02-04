@@ -75,8 +75,13 @@ function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callb
   const requestedEventIndex = callbackQueryData;
   const eventList = callbackQueryCacheData;
   const message = msg_formatter.formatEventDetail(eventList[requestedEventIndex]);
-  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-    console.log(result.message);
+  tg_caller.sendChatAction(chatId, 'typing').then((result) => {
+    console.log(result);
+    tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+      console.log(result.message);
+    }).catch((error) => {
+      console.log(error);
+    })
   }).catch((error) => {
     console.log(error);
   })
