@@ -12,6 +12,7 @@ var platform = require('./routes/platform');
 var tgCaller = require('./api_callers/telegram_caller');
 var config = require('./config');
 let cacheProvider = require('./cache_provider');
+var cronSetup = require('./crons/cron_setup');
 
 var app = express();
 
@@ -52,6 +53,9 @@ cacheProvider.start(function(err) {
     console.log("Cache provider started");
   }
 });
+
+// Start Push notification cron job
+cronSetup.startPNCronJob();
 
 // setup telegram WebHook
 tgCaller.setWebHook().then((result) => {

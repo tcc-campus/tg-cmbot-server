@@ -39,7 +39,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
       console.log("No callback query found from cache key");
     }
   } else {
-    console.log("No cache key-value found from cache kdy");
+    console.log("No cache key-value found from cache key");
   }
 
 }

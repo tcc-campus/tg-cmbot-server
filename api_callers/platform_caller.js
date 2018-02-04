@@ -56,7 +56,8 @@ function deleteSubscriber(chatId) {
 function getUpcomingEvents(startDate, endDate) {
   console.log("Getting upcoming events from platform");
   return new Promise(function(resolve, reject) {
-    const url = `${config.PLATFORM_URL}/upcoming`;
+    // const url = `${config.PLATFORM_URL}/upcoming`;
+    const url = "https://tcc-campus-platform.herokuapp.com/platform528402819:AAE_ODuTR-bsB0yCeH77_Sy3VoIpSYBA1mM/upcoming"
     const options = {
       method: 'get',
       url: url,
@@ -79,7 +80,8 @@ function getUpcomingEvents(startDate, endDate) {
 
 function getListOfSubscribers() {
   return new Promise(function(resolve, reject) {
-    const url = `${config.PLATFORM_URL}/subscriber`;
+    // const url = `${config.PLATFORM_URL}/subscriber`;
+    const url = "https://tcc-campus-platform.herokuapp.com/platform528402819:AAE_ODuTR-bsB0yCeH77_Sy3VoIpSYBA1mM/subscriber"
     const options = {
       method: 'get',
       url: url,
