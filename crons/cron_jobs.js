@@ -12,7 +12,7 @@ function sendPushNotification() {
   return new Promise(function(resolve, reject) {
     const startDate = moment().add(3, 'days').format("YYYY-MM-DD");
     const endDate = moment().add(4, 'days').format("YYYY-MM-DD");
-    pf_caller.getUpcomingEvents("2018-03-03", "2018-03-04").then((result) => {
+    pf_caller.getUpcomingEvents(startDate, endDate).then((result) => {
       const eventList = JSON.parse(result.body);
       if(eventList.length < 1) {
         console.log("No events found for:", startDate);
@@ -24,7 +24,7 @@ function sendPushNotification() {
           pf_caller.getListOfSubscribers().then((result) => {
             console.log(result.message);
             const subscriberList = result.body;
-            tg_caller.sendMessageToList(['64094547', '-306060099'], msgToSend).then((resultList) => {
+            tg_caller.sendMessageToList(subscriberList, msgToSend).then((resultList) => {
               console.log(resultList);
               const errorList = resultList.filter((result) => !result.message);
               if (errorList.length > 0) {
