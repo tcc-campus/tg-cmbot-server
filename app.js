@@ -4,7 +4,7 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var http = require("http");
+var request = require('request');
 
 var index = require('./routes/index');
 var webhook = require('./routes/webhook');
@@ -66,7 +66,7 @@ tgCaller.setWebHook().then((result) => {
 
 // prevent timeout
 setInterval(function() {
-    http.get(process.env.PUBLIC_URL);
-}, 600000); //
+  request.get(process.env.PUBLIC_URL);
+}, 10*60*1000);
 
 module.exports = app;
