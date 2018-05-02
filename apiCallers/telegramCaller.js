@@ -229,6 +229,35 @@ function sendChatAction(chatId, action) {
   });
 }
 
+function sendAnswerCallbackQuery(callbackQueryId, options) {
+  console.log(`Sending chat action (${action}) to chat_id: ${chatId}`);
+  return new Promise(function(resolve, reject) {
+    let payload = {
+      callback_query_id: callbackQueryId
+    }
+    if(options) {
+      payload = Object.assign({}, payload, options);
+    }
+    const url = `${config.TELEGRAM_API_URL}/answerCallbackQuery`;
+    const options = {
+      method: 'post',
+      url: url,
+      headers: {'content-type': 'application/json' },
+      body: payload,
+      json: true,
+    };
+
+    request(options, function(error, response, body) {
+      if(!error && response.statusCode == 200) {
+        const message = 'Answer Callback Query sent to callback_query_id: ' + callbackQueryId;
+        resolve(message);
+      } else {
+        reject(error);
+      }
+    });
+  });
+}
+
 async function sendMessageToList(chatIdList, message) {
   console.log("Sending message to list of chatIds " + chatIdList);
   return new Promise(async function(resolve, reject) {

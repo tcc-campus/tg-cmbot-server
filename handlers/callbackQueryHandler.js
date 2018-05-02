@@ -14,6 +14,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   console.log("Handling Telegram Callback Query Event");
   const messageId = callbackQueryObj.message.message_id;
   const chatId = callbackQueryObj.message.chat.id;
+  const callbackQueryId = callbackQueryObj.callback_query.id;
   const firstName = callbackQueryObj.message.chat.first_name;
   const callbackQueryData = callbackQueryObj.data;
 
@@ -26,10 +27,10 @@ function handleCallbackQueryEvent(callbackQueryObj) {
       console.log("Callback query type detected: " + callbackQueryType);
       switch(callbackQueryType) {
         case cUtil.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
-          handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
+          handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbackQueryData);
           break;
         case cUtil.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
-          handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
+          handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, callbackQueryData, callbackQueryCacheData);
           break;
         default:
           console.log("Unknown callback query type");
@@ -44,47 +45,40 @@ function handleCallbackQueryEvent(callbackQueryObj) {
 
 }
 
-function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
+async function handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbackQueryData) {
   console.log("Handing upcoming choose month callback query");
-  const requestedMonth = callbackQueryData
+  const requestedMonth = callbackQueryData;
   const dateRange = dtUtil.getDateRangeForMonth(requestedMonth);
   console.log("Date range selected: " + JSON.stringify(dateRange));
-  tgCaller.sendChatAction(chatId, 'typing').then((result) => {
-    console.log(result);
-    pfCaller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
-      console.log(result.message);
-      const eventList = JSON.parse(result.body);
-      console.log(eventList);
-      evtFormatter.formatEventList(eventList).then(formattedEventList => {
-        msgFormatter.formatUpcomingMessage(formattedEventList, requestedMonth).then((message) => {
-          getEventDetailInlineKeyboard(formattedEventList.length).then((inlineKeyboardButtonList) => {
-            tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, cUtil.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL, formattedEventList);
-          })
-        })
-      })
-    }).catch((error) => {
-      console.log(error);
-    })
-  }).catch((error) => {
-    console.log(error);
-  })
+  try {
+    await tgCaller.sendChatAction(chatId, 'typing');
+    const upcomingEvents = await pfCaller.getUpcomingEvents(dateRange.start_date, dateRange.end_date);
+    const eventList = JSON.parses(upcomingEvents.body);
+    console.log(eventList);
+    const formattedEventList = await evtFormatter.formatEventList(eventList);
+    const message = await msgFormatter.formatUpcomingMessage(formattedEventList, requestedMonth);
+    const inlineKeyboardButtonList = await getEventDetailInlineKeyboard(formattedEventList.length);
+    await tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, cUtil.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL, formattedEventList);
+    await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+  } catch(error) {
+    console.log("Error handling Upcoming Month Callback Query:", error);
+    await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+  }
 }
 
-function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData) {
+async function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, callbackQueryData, callbackQueryCacheData) {
   console.log("Handling upcoming event detail callback query");
   const requestedEventIndex = callbackQueryData;
   const eventList = callbackQueryCacheData;
   const message = msgFormatter.formatEventDetail(eventList[requestedEventIndex]);
-  tgCaller.sendChatAction(chatId, 'typing').then((result) => {
-    console.log(result);
-    tgCaller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
-      console.log(result.message);
-    }).catch((error) => {
-      console.log(error);
-    })
-  }).catch((error) => {
-    console.log(error);
-  })
+  try {
+    await tgCaller.sendChatAction(chatId, 'typing');
+    await tgCaller.sendMessage(chatId, message, {'parse_mode': 'markdown'});
+    await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+  } catch(error) {
+    console.log("Error handling Upcoming Event Detail Callback Query:", error);
+    await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+  }
 }
 
 function getEventDetailInlineKeyboard(listSize) {
