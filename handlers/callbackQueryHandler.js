@@ -53,7 +53,7 @@ async function handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbac
   try {
     await tgCaller.sendChatAction(chatId, 'typing');
     const upcomingEvents = await pfCaller.getUpcomingEvents(dateRange.start_date, dateRange.end_date);
-    const eventList = JSON.parses(upcomingEvents.body);
+    const eventList = JSON.parse(upcomingEvents.body);
     console.log(eventList);
     const formattedEventList = await evtFormatter.formatEventList(eventList);
     const message = await msgFormatter.formatUpcomingMessage(formattedEventList, requestedMonth);
