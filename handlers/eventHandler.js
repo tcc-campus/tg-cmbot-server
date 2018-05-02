@@ -3,7 +3,7 @@
 *     1. handleTgEvent(eventObj): For handling telegram Events
 */
 
-const msgHandler = require('./message_handler');
+const msgHandler = require('./messageHandler');
 const cqHandler = require('./callbackQueryHandler');
 
 function handleTgEvent(eventObj) {
