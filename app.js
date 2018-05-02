@@ -10,10 +10,10 @@ var index = require('./routes/index');
 var webhook = require('./routes/webhook');
 var platform = require('./routes/platform');
 
-var tgCaller = require('./api_callers/telegram_caller');
+var tgCaller = require('./apiCallers/telegramCaller');
 var config = require('./config');
-let cacheProvider = require('./cache_provider');
-var cronSetup = require('./crons/cron_setup');
+let cacheProvider = require('./cacheProvider');
+var cronSetup = require('./crons/cronSetup');
 
 var app = express();
 

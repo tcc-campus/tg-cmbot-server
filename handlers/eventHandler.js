@@ -3,13 +3,13 @@
 *     1. handleTgEvent(eventObj): For handling telegram Events
 */
 
-const msg_handler = require('./message_handler');
-const cq_handler = require('./callback_query_handler');
+const msgHandler = require('./message_handler');
+const cqHandler = require('./callbackQueryHandler');
 
 function handleTgEvent(eventObj) {
   console.log("Handling Telegram Event");
   if (eventObj.message) {
-    msg_handler.handleMessageEvent(eventObj.message);
+    msgHandler.handleMessageEvent(eventObj.message);
   } else if (eventObj.edited_message) {
       console.log("edited_message event detected");
   } else if (eventObj.channel_post ) {
@@ -21,7 +21,7 @@ function handleTgEvent(eventObj) {
   } else if (eventObj.chosen_inline_result) {
       console.log("chosen_inline_result event detected");
   } else if (eventObj.callback_query) {
-      cq_handler.handleCallbackQueryEvent(eventObj.callback_query);
+      cqHandler.handleCallbackQueryEvent(eventObj.callback_query);
   } else {
       console.log("unknown event detected");
   }

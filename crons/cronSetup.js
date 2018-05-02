@@ -4,7 +4,7 @@
 */
 
 const CronJob = require('cron').CronJob;
-const cron_jobs = require('./cron_jobs');
+const cronJobs = require('./cronJobs');
 
 function startPNCronJob() {
   console.log("Creating Push notification Cron Job");
@@ -12,7 +12,7 @@ function startPNCronJob() {
     cronTime: '00 00 10 * * 0-6',
     onTick: function() {
       console.log("Starting push notification cron job");
-      cron_jobs.sendPushNotification().then((result) => {
+      cronJobs.sendPushNotification().then((result) => {
         //Wait for job to finish
       });
     },

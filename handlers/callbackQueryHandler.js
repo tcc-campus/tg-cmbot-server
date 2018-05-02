@@ -3,12 +3,12 @@
 *     1. handleCallbackQueryEvent(callbackQueryObj): Handle Telegram Callback Query Event
 */
 
-const dt_util = require('../utils/date_time_util');
-const c_util = require('../utils/cache_util');
-const evt_formatter = require('../utils/event_formatter');
-const msg_formatter = require('../utils/message_formatter');
-const tg_caller = require('../api_callers/telegram_caller');
-const pf_caller = require('../api_callers/platform_caller');
+const dtUtil = require('../utils/dateTimeUtil');
+const cUtil = require('../utils/cacheUtil');
+const evtFormatter = require('../utils/eventFormatter');
+const msgFormatter = require('../utils/messageFormatter');
+const tgCaller = require('../apiCallers/telegramCaller');
+const pfCaller = require('../apiCallers/platformCaller');
 
 function handleCallbackQueryEvent(callbackQueryObj) {
   console.log("Handling Telegram Callback Query Event");
@@ -17,7 +17,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   const firstName = callbackQueryObj.message.chat.first_name;
   const callbackQueryData = callbackQueryObj.data;
 
-  const cacheObj = c_util.getCacheObj(messageId)
+  const cacheObj = cUtil.getCacheObj(messageId)
   if (cacheObj) {
     console.log("Cache Object: " + JSON.stringify(cacheObj));
     const callbackQueryType = cacheObj.type;
@@ -25,10 +25,10 @@ function handleCallbackQueryEvent(callbackQueryObj) {
     if (callbackQueryType) {
       console.log("Callback query type detected: " + callbackQueryType);
       switch(callbackQueryType) {
-        case c_util.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
+        case cUtil.CALLBACK_QUERY_TYPE.UPCOMING_MONTH:
           handleUpcomingMonthCallbackQuery(chatId, callbackQueryData);
           break;
-        case c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
+        case cUtil.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL:
           handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callbackQueryCacheData);
           break;
         default:
@@ -47,18 +47,18 @@ function handleCallbackQueryEvent(callbackQueryObj) {
 function handleUpcomingMonthCallbackQuery(chatId, callbackQueryData) {
   console.log("Handing upcoming choose month callback query");
   const requestedMonth = callbackQueryData
-  const dateRange = dt_util.getDateRangeForMonth(requestedMonth);
+  const dateRange = dtUtil.getDateRangeForMonth(requestedMonth);
   console.log("Date range selected: " + JSON.stringify(dateRange));
-  tg_caller.sendChatAction(chatId, 'typing').then((result) => {
+  tgCaller.sendChatAction(chatId, 'typing').then((result) => {
     console.log(result);
-    pf_caller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
+    pfCaller.getUpcomingEvents(dateRange.start_date, dateRange.end_date).then((result) => {
       console.log(result.message);
       const eventList = JSON.parse(result.body);
       console.log(eventList);
-      evt_formatter.formatEventList(eventList).then(formattedEventList => {
-        msg_formatter.formatUpcomingMessage(formattedEventList, requestedMonth).then((message) => {
+      evtFormatter.formatEventList(eventList).then(formattedEventList => {
+        msgFormatter.formatUpcomingMessage(formattedEventList, requestedMonth).then((message) => {
           getEventDetailInlineKeyboard(formattedEventList.length).then((inlineKeyboardButtonList) => {
-            tg_caller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, c_util.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL, formattedEventList);
+            tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, cUtil.CALLBACK_QUERY_TYPE.UPCOMING_EVENT_DETAIL, formattedEventList);
           })
         })
       })
@@ -74,10 +74,10 @@ function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryData, callb
   console.log("Handling upcoming event detail callback query");
   const requestedEventIndex = callbackQueryData;
   const eventList = callbackQueryCacheData;
-  const message = msg_formatter.formatEventDetail(eventList[requestedEventIndex]);
-  tg_caller.sendChatAction(chatId, 'typing').then((result) => {
+  const message = msgFormatter.formatEventDetail(eventList[requestedEventIndex]);
+  tgCaller.sendChatAction(chatId, 'typing').then((result) => {
     console.log(result);
-    tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+    tgCaller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
       console.log(result.message);
     }).catch((error) => {
       console.log(error);

@@ -2,15 +2,15 @@
 *   Exported Modules:
 *     1. handleReply(chatId, msgObj): Handle Telegram Message Reply
 */
-const tg_caller = require('../api_callers/telegram_caller');
+const tgCaller = require('../apiCallers/telegramCaller');
 const config = require('../config');
-const c_util = require('../utils/cache_util');
+const cUtil = require('../utils/cacheUtil');
 
 function handleReply(chatId, msgObj) {
   const replyId = msgObj.reply_to_message.message_id;
   const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + replyId);
-  const cacheObj = c_util.getCacheObj(replyId);
+  const cacheObj = cUtil.getCacheObj(replyId);
   if (cacheObj) {
     console.log("Cache Object: " + JSON.stringify(cacheObj));
     const replyType = cacheObj.type;
@@ -18,7 +18,7 @@ function handleReply(chatId, msgObj) {
     if (replyType) {
       console.log("Reply type detected: " + replyType);
       switch(replyType) {
-        case c_util.REPLY_TYPE.FEEDBACK:
+        case cUtil.REPLY_TYPE.FEEDBACK:
           handleFeedbackReply(chatId, firstName, msgObj);
           break;
         default:
@@ -38,11 +38,11 @@ function handleFeedbackReply(chatId, firstName, msgObj) {
   const feedbackMsg = msgObj.text;
   console.log("Feedback received: " + feedbackMsg);
   const message = `Thanks ${firstName} for your feedback. I will let my developer know so I can improve! 😊`;
-  tg_caller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
+  tgCaller.sendMessage(chatId, message, {'parse_mode': 'markdown'}).then((result) => {
     console.log(result.message);
     console.log("Sending feedback to developers");
     const feedbackMsgForDev = `Hey Developers! Feedback received from ${firstName}:\n\n"${feedbackMsg}"`;
-    tg_caller.sendMessage(config.DEV_GROUP_ID, feedbackMsgForDev, {'parse_mode': 'markdown'}).then((result) => {
+    tgCaller.sendMessage(config.DEV_GROUP_ID, feedbackMsgForDev, {'parse_mode': 'markdown'}).then((result) => {
       console.log(result.message);
     }).catch((err) => {
       console.log(err);

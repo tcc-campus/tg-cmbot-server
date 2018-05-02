@@ -2,9 +2,9 @@
 *   Exported Modules:
 *     1. handleMessageEvent(msgObj): Handle Telegram Message Event
 */
-const tg_caller = require('../api_callers/telegram_caller');
-const cmd_handler = require('./command_handler');
-const rp_handler = require('./reply_handler');
+const tgCaller = require('../apiCallers/telegramCaller');
+const cmdHandler = require('./commandHandler');
+const rpHandler = require('./replyHandler');
 
 function handleMessageEvent(msgObj) {
   console.log("Handling Telegram Message Event")
@@ -14,14 +14,14 @@ function handleMessageEvent(msgObj) {
     text = text.trim();
     if (isReply(msgObj)) {
       console.log("Reply Detected");
-      rp_handler.handleReply(chatId, msgObj);
+      rpHandler.handleReply(chatId, msgObj);
     } else if (isCommandReceived(text)) {
       const command = text.split('@')[0].substr(1);
       console.log("Command Detected: " + command);
-      cmd_handler.handleCommand(chatId, msgObj, command);
+      cmdHandler.handleCommand(chatId, msgObj, command);
     } else {
       console.log("Echoing Message")
-      tg_caller.sendMessage(chatId, text).then((result) => {
+      tgCaller.sendMessage(chatId, text).then((result) => {
         console.log(result.message);
       }).catch((error) => {
         console.log(error);

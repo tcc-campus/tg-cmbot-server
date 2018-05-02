@@ -1,4 +1,4 @@
-let cacheProvider = require('../cache_provider');
+let cacheProvider = require('../cacheProvider');
 
 const REPLY_TYPE = {
   FEEDBACK: 'feedback_reply',
