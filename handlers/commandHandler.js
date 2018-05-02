@@ -6,6 +6,7 @@
 const tgCaller = require('../apiCallers/telegramCaller');
 const pfCaller = require('../apiCallers/platformCaller');
 const cUtil = require('../utils/cacheUtil');
+const upcomingUtil = require('../utils/upcomingUtil');
 
 function handleCommand(chatId, msgObj, command) {
   console.log("Handling Command: " + command)
@@ -46,18 +47,9 @@ function handleStart(chatId, firstName) {
   });
 }
 
-function handleUpcoming(chatId) {
-  const message = "Which month of upcoming events do you want to view?";
-  const inlineKeyboardButtonList = [[
-    {
-      text: 'This Month',
-      callback_data: 'this_month',
-    },
-    {
-      text: 'Next Month',
-      callback_data: 'next_month',
-    }
-  ]]
+async function handleUpcoming(chatId) {
+  const message = await upcomingUtil.getMessage('main_menu');
+  const inlineKeyboardButtonList = await upcomingUtil.getInlineKeyboard('main_menu');
   tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, cUtil.CALLBACK_QUERY_TYPE.UPCOMING_MONTH);
 }
 
