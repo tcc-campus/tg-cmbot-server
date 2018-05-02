@@ -281,4 +281,5 @@ module.exports = {
   sendMessageWithInlineKeyboard,
   sendMessageToList,
   sendChatAction,
+  sendAnswerCallbackQuery,
 }
