@@ -14,7 +14,7 @@
 const config = require('../config');
 const request = require('request');
 
-let cacheProvider = require('../cache_provider');
+let cacheProvider = require('../cacheProvider');
 
 function setWebHook() {
   console.log("Setting Webhook on Telegram");
