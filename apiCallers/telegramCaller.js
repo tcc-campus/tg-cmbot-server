@@ -231,12 +231,13 @@ function sendChatAction(chatId, action) {
 
 function sendAnswerCallbackQuery(callbackQueryId, options) {
   console.log(`Sending answer callback query (${options}) to callback query: ${callbackQueryId}`);
+  const callbackOptions = options;
   return new Promise(function(resolve, reject) {
     let payload = {
       callback_query_id: callbackQueryId
     }
-    if(options) {
-      payload = Object.assign({}, payload, options);
+    if(callbackOptions) {
+      payload = Object.assign({}, payload, callbackOptions);
     }
     const url = `${config.TELEGRAM_API_URL}/answerCallbackQuery`;
     const options = {
