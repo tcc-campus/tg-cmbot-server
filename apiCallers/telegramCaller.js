@@ -230,7 +230,7 @@ function sendChatAction(chatId, action) {
 }
 
 function sendAnswerCallbackQuery(callbackQueryId, options) {
-  console.log(`Sending chat action (${action}) to chat_id: ${chatId}`);
+  console.log(`Sending answer callback query (${options}) to callback query: ${callbackQueryId}`);
   return new Promise(function(resolve, reject) {
     let payload = {
       callback_query_id: callbackQueryId
