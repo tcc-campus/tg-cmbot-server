@@ -14,7 +14,7 @@ function handleCallbackQueryEvent(callbackQueryObj) {
   console.log("Handling Telegram Callback Query Event");
   const messageId = callbackQueryObj.message.message_id;
   const chatId = callbackQueryObj.message.chat.id;
-  const callbackQueryId = callbackQueryObj.callback_query.id;
+  const callbackQueryId = callbackQueryObj.id;
   const firstName = callbackQueryObj.message.chat.first_name;
   const callbackQueryData = callbackQueryObj.data;
 
