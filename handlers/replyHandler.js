@@ -4,37 +4,26 @@
 */
 const tgCaller = require('../apiCallers/telegramCaller');
 const config = require('../config');
-const cUtil = require('../utils/cacheUtil');
+
+const types = {
+  FEEDBACK: 'feedback'
+}
 
 function handleReply(chatId, msgObj) {
   const replyId = msgObj.reply_to_message.message_id;
+  const previousMsg = msgObj.reply_to_message.text;
   const firstName = msgObj.chat.first_name || '';
-  console.log("Handling reply to message: " + replyId);
-  const cacheObj = cUtil.getCacheObj(replyId);
-  if (cacheObj) {
-    console.log("Cache Object: " + JSON.stringify(cacheObj));
-    const replyType = cacheObj.type;
-    const replyCacheData = cacheObj.data;
-    if (replyType) {
-      console.log("Reply type detected: " + replyType);
-      switch(replyType) {
-        case cUtil.REPLY_TYPE.FEEDBACK:
-          handleFeedbackReply(chatId, firstName, msgObj);
-          break;
-        default:
-          console.log("Unknown reply type");
-          break;
-        }
-    } else {
-      console.log("No reply found from cache key");
-    }
-  } else {
-    console.log("Cache key-value doesn't exist!");
+  console.log("Handling reply to message: " + previousMsg);
+  switch(_getReplyType(previousMsg)) {
+    case types.FEEDBACK:
+      _handleFeedbackReply(chatId, firstName, msgObj);
+      break;
+    default:
+      break;
   }
-
 }
 
-function handleFeedbackReply(chatId, firstName, msgObj) {
+function _handleFeedbackReply(chatId, firstName, msgObj) {
   const feedbackMsg = msgObj.text;
   console.log("Feedback received: " + feedbackMsg);
   const message = `Thanks ${firstName} for your feedback. I will let my developer know so I can improve! 😊`;
@@ -50,6 +39,31 @@ function handleFeedbackReply(chatId, firstName, msgObj) {
   }).catch((err) => {
     console.log(err);
   })
+}
+
+function _getReplyType(previousMsg) {
+  if (_isCommand(previousMsg)) {
+    const command = text.split('@')[0].substr(1);
+    console.log("Command Detected: " + command);
+    switch(command) {
+      case 'feedback':
+        return types.FEEDBACK;
+      default:
+        console.log("Reply to command not supported.");
+        break;
+      }
+  } else {
+    console.log("Reply to message not supported.");
+  }
+  return null;
+}
+
+function _isCommand(text) {
+  if (text.charAt(0) === '/') {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 module.exports = {
