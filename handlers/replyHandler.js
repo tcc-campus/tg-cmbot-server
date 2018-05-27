@@ -14,7 +14,9 @@ function handleReply(chatId, msgObj) {
   const previousMsg = msgObj.reply_to_message.text;
   const firstName = msgObj.chat.first_name || '';
   console.log("Handling reply to message: " + previousMsg);
-  switch(_getReplyType(previousMsg)) {
+  const replyType = _getReplyType(previousMsg);
+  console.log("Reply Type: ", replyType);
+  switch(replyType) {
     case types.FEEDBACK:
       _handleFeedbackReply(chatId, firstName, msgObj);
       break;
