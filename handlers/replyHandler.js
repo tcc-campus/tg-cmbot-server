@@ -42,27 +42,12 @@ function _handleFeedbackReply(chatId, firstName, msgObj) {
 }
 
 function _getReplyType(previousMsg) {
-  if (_isCommand(previousMsg)) {
-    const command = text.split('@')[0].substr(1);
-    console.log("Command Detected: " + command);
-    switch(command) {
-      case 'feedback':
-        return types.FEEDBACK;
-      default:
-        console.log("Reply to command not supported.");
-        break;
-      }
-  } else {
-    console.log("Reply to message not supported.");
-  }
-  return null;
-}
-
-function _isCommand(text) {
-  if (text.charAt(0) === '/') {
-    return true;
-  } else {
-    return false;
+  switch(previousMsg) {
+    case 'Please let me know how I can improve by replying to this message 🙏🏻':
+      return types.FEEDBACK;
+    default:
+      console.log("Reply to message not supported.");
+      return null;
   }
 }
 
