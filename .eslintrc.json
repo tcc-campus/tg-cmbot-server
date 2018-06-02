@@ -1,0 +1,16 @@
+{
+    "extends": "airbnb-base",
+    "rules": {
+    "no-param-reassign": ["error", {
+      "props": true,
+      "ignorePropertyModificationsFor": ["context"]
+    }],
+    "func-names": ["error", "never"],
+    "no-console": "off",
+    "import/no-extraneous-dependencies": [
+      2, {
+        "devDependencies": true
+      }
+    ]
+  }
+}

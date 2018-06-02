@@ -7,4 +7,12 @@ module.exports = {
   PLATFORM_URL: `${process.env.PLATFORM_URL}/platform${process.env.BOT_TOKEN}`,
   CACHE_DURATION: 600,
   DEV_GROUP_ID: process.env.DEV_GROUP_ID,
+  postgres: {
+    username: POSTGRES_USERNAME,
+    password: POSTGRES_PASSWORD,
+    host: POSTGRES_HOST,
+    port: POSTGRES_PORT,
+    database: POSTGRES_DATABASE,
+    applicationName: APPLICATION_NAME,
+  },
 }
