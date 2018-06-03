@@ -1,30 +1,18 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 
-function getDateRangeForMonth(month) {
-  let dateRange = {};
+function getDateStringForMonth(month) {
+  const dateRange = {};
   switch (month) {
     case 'this_month':
-      dateRange = {
-        start_date: moment().startOf('month').format('YYYY-MM-DD'),
-        end_date: moment().endOf('month').format('YYYY-MM-DD')
-      }
-      break;
+      return moment().startOf('month').tz('Asia/Singapore').format('YYYY-MM');
     case 'next_month':
-      dateRange = {
-        start_date: moment().add(1, 'month').startOf('month').format('YYYY-MM-DD'),
-        end_date: moment().add(1, 'month').endOf('month').format('YYYY-MM-DD')
-      }
-      break;
+      return moment().add(1, 'month').startOf('month').tz('Asia/Singapore').format('YYYY-MM');
     default:
-      dateRange = {
-        start_date: moment().startOf('month').format('YYYY-MM-DD'),
-        end_date: moment().endOf('month').format('YYYY-MM-DD')
-      }
-      break;
+      return moment().startOf('month').tz('Asia/Singapore').format('YYYY-MM');
   }
-  return dateRange;
+  return null;
 }
 
 module.exports = {
-  getDateRangeForMonth,
-}
+  getDateStringForMonth,
+};

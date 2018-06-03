@@ -1,4 +1,4 @@
-let cacheProvider = require('../cacheProvider');
+let cacheProvider = require('../cache/cacheProvider');
 
 const CALLBACK_QUERY_TYPE = {
   UPCOMING_MONTH: 'upcoming_month_callback_query',

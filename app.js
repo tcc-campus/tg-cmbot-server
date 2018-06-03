@@ -1,21 +1,21 @@
-var express = require('express');
-var helmet = require('helmet');
-var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var request = require('request');
+const express = require('express');
+const helmet = require('helmet');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const request = require('request');
 
-var index = require('./routes/index');
-var webhook = require('./routes/webhook');
-var platform = require('./routes/platform');
+const index = require('./routes/index');
+const webhook = require('./routes/webhook');
+const platform = require('./routes/platform');
 
-var tgCaller = require('./apiCallers/telegramCaller');
-var config = require('./config');
-let cacheProvider = require('./cacheProvider');
-var cronSetup = require('./crons/cronSetup');
+const tgCaller = require('./apiCallers/telegramCaller');
+const config = require('./config');
+const cacheProvider = require('./cache/cacheProvider');
+const cronSetup = require('./crons/cronSetup');
+const evtService = require('./services/eventService');
 
-var app = express();
+const app = express();
 
 app.use(helmet());
 app.use(logger('dev'));
@@ -28,45 +28,47 @@ app.use(`/bot${config.BOT_TOKEN}`, webhook);
 app.use(`/platform${config.BOT_TOKEN}`, platform);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use((err, req, res) => {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  const response = res;
+  response.locals.message = err.message;
+  response.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.send('error');
+  response.status(err.status || 500);
+  response.send('error');
 });
 
-// start cached provider
-cacheProvider.start(function(err) {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("Cache provider started");
+async function init() {
+  try {
+    // start cache provider
+    cacheProvider.start();
+
+    // set Telegram Webhook
+    await tgCaller.setWebHook();
+
+    // Start Push notification cron job
+    cronSetup.startPNCronJob();
+
+    // Set all events in cache
+    evtService.setAll();
+  } catch (error) {
+    console.log(error);
   }
-});
+}
 
-// Start Push notification cron job
-cronSetup.startPNCronJob();
-
-// setup telegram WebHook
-tgCaller.setWebHook().then((result) => {
-  console.log(result);
-}).catch((error) => {
-  console.log(error);
-});
+init();
 
 // prevent timeout
-setInterval(function() {
+setInterval(() => {
   request.get(process.env.PUBLIC_URL);
-}, 10*60*1000);
+}, 10 * 60 * 1000);
 
 module.exports = app;

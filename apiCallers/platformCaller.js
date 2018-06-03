@@ -26,7 +26,7 @@ function postSubscriber(chatId, firstName) {
       if(!error && response.statusCode == 200) {
         resolve('New Subscriber Registered: ' + chatId);
       } else {
-        reject(error);
+        reject(new Error(`Subscriber registration unsuccessful: ${error}`));
       }
     });
   });

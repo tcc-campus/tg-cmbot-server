@@ -5,16 +5,19 @@
 *        an array of JSON obj
 */
 
+const crypto = require('crypto-js');
 const moment = require('moment-timezone');
 
 function formatEvent(event) {
   var startDateTimeObj = moment.tz(event.start.dateTime, "Asia/Singapore");
   var endDateTimeObj = moment.tz(event.end.dateTime, "Asia/Singapore");
   return {
+    id: crypto.HmacSHA1(event.id, 'SURGE').toString(),
     event_name: event.summary,
     event_message: event.description,
     event_location: event.location,
     event_date: startDateTimeObj.format("dddd, DD MMM YYYY"),
+    event_date_raw: startDateTimeObj.format(),
     event_timing: {
       start_time: startDateTimeObj.format("h:mm a"),
       end_time: endDateTimeObj.format("h:mm a"),
@@ -24,13 +27,13 @@ function formatEvent(event) {
 
 function formatEventList(eventList) {
   console.log("Formatting Event List with " + eventList.length + " events");
-  return new Promise(function(resolve, reject) {
-    let formattedEventList = [];
-    for (var i = 0; i < eventList.length; i++) {
+  let formattedEventList = [];
+  for (var i = 0; i < eventList.length; i++) {
+    if(eventList[i].id !== '_6913ehho8ork4b9h6or4cb9k6oq3gba16t244ba16d236g9o64rjid1i74') {
       formattedEventList.push(formatEvent(eventList[i]));
     }
-    resolve(formattedEventList);
-  });
+  }
+  return formattedEventList;
 }
 
 module.exports = {
