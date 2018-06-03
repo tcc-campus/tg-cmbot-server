@@ -1,6 +1,5 @@
 const express = require('express');
 const request = require('request');
-const config = require('../config');
 var router = express.Router();
 
 const enHandler = require('../handlers/eventNotificationHandler');

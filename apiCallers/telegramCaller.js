@@ -1,286 +1,399 @@
-/* Modules to make API Calls to Telegram Server
-*   Exported Modules:
-*     1. setWebHook(): For setting bot webhook on Telegram Server
-*     2. sendMessage(chatId, message, options): For sending messages to Telegram
-*        chats
-*     3. editMessage(chatId, msgId, editedMessage, options): For editing messages
-*        sent by bot to user
-*     4. editInlineKeyboardOnly(chatId, msgId, inlineKeyboardButtonList): For
-*        editing the inline keyboard only
-*     5. sendMessageWithReply(chatId, message, replyType): For sending messages
-*        with force reply to Telegram chats
-*     6. sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList,
-*        callbackQueryType): For sending messages with inline keyboard to telegram
-*        chats
-*     7. sendChatAction(chatId, action): For sending chat actions to telegram user
-*/
+/**
+ * APIs for Telegram Server
+ */
 
 const config = require('../config');
-const request = require('request');
+const axios = require('axios');
+const async = require('async');
+const sleep = require('await-sleep');
 
-let cacheProvider = require('../cacheProvider');
+const randomUtil = require('../utils/randomUtil');
 
-function setWebHook() {
-  console.log("Setting Webhook on Telegram");
-  return new Promise(function(resolve, reject) {
-    const url = `${config.TELEGRAM_API_URL}/setWebhook`;
-    const options = {
+/**
+ * Post request to Telegram Server
+ * @param {string} tgMethod
+ * @param {Object} payload
+ *
+ * @private
+ */
+async function postToTelegram(tgMethod, payload) {
+  try {
+    const response = await axios({
+      url: `${config.TELEGRAM_API_URL}/${tgMethod}`,
       method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: {
-        url: config.WEBHOOK_URL,
+      headers: {
+        'content-type': 'application/json',
       },
-      json: true,
-    };
-
-    request(options, function(error, response, body) {
-      if(!error && response.statusCode == 200) {
-        resolve('Telegram Webhook Set');
-      } else {
-        reject(error);
-      }
+      data: payload,
     });
-  });
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify(response.data));
+    }
+    return JSON.stringify(response.data);
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
-function sendMessage(chatId, message, options) {
-  console.log("Sending Message to chat_id:" + chatId);
+/**
+ * Set Webhook on Telegram
+ *
+ * @public
+ */
+async function setWebHook() {
+  console.log('Setting webhook on Telegram');
+  try {
+    await postToTelegram('setWebHook', {
+      url: config.WEBHOOK_URL,
+    });
+    console.log('Telegram webhook set');
+  } catch (error) {
+    throw new Error(`Failed to set Telegram Webhook. ${error}`);
+  }
+}
+
+/**
+ * Send Message to Telegram User
+ *
+ * @param {string} chatId
+ * @param {string} message
+ * @param {Object} options (optional)
+ *
+ * @public
+ */
+async function sendMessage(chatId, message, options) {
+  console.log('Sending Message to chat_id:', chatId);
   let parseMode = '';
   let replyMarkup = {};
-  if(options) {
+  if (options) {
     parseMode = options.parse_mode || '';
-    replyMarkup = options.force_reply || options.inline_keyboard || {};
-
+    replyMarkup =
+      options.force_reply ||
+      options.inline_keyboard ||
+      options.keyboard ||
+      options.remove_keyboard ||
+      {};
   }
-  return new Promise(function(resolve, reject) {
-    const url = `${config.TELEGRAM_API_URL}/sendMessage`;
-    const options = {
-      method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: {
-        chat_id: chatId,
-        text: message,
-        parse_mode: parseMode,
-        reply_markup: replyMarkup,
-      },
-      json: true,
-    };
+  const payload = {
+    chat_id: chatId,
+    text: message,
+    parse_mode: parseMode,
+    reply_markup: replyMarkup,
+  };
+  try {
+    const result = await postToTelegram('sendMessage', payload);
+    console.log(`Message sent to ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Failed to send message to ${chatId}. ${error}`);
+  }
+}
 
-    request(options, function(error, response, body) {
-      setTimeout(() => {
-        if(!error && response.statusCode == 200) {
-          const message = 'Message Sent to chat_id: ' + chatId;
-          resolve({message: message, body: body});
-        } else {
-          reject("Failed to send message to " + chatId + ": " + error);
-        }
-      }, 200);
-    });
+/**
+ * Send Message with Forced Reply to Telegram User
+ *
+ * @param {string} chatId
+ * @param {string} message
+ *
+ * @public
+ */
+async function sendMessageWithReply(chatId, message) {
+  console.log('Forcing reply on message to be sent:', chatId);
+  await sendMessage(chatId, message, {
+    parse_mode: 'markdown',
+    force_reply: { force_reply: true },
   });
 }
 
-function editMessage(chatId, msgId, editedMessage, options) {
+/**
+ * Send Message with Inline Keyboard to Telegram User
+ *
+ * @param {string} chatId
+ * @param {string} message
+ * @param {Array} inlineKeyboardButtonList
+ *
+ * @public
+ */
+async function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList) {
+  console.log('Sending message with inline keyboard:', chatId);
+  const sendOptions = {
+    parse_mode: 'markdown',
+    inline_keyboard: {
+      inline_keyboard: inlineKeyboardButtonList,
+    },
+  };
+  await sendMessage(chatId, message, sendOptions);
+}
+
+/**
+ * Send Message with Reply Keyboard to Telegram User
+ *
+ * @param {string} chatId
+ * @param {string} message
+ * @param {Array} replyKeyboardButtonList
+ *
+ * @public
+ */
+async function sendMessageWithReplyKeyboard(chatId, message, replyKeyboardButtonList) {
+  console.log('Sending message with reply keyboard:', chatId);
+  const sendOptions = {
+    parse_mode: 'markdown',
+    keyboard: {
+      keyboard: replyKeyboardButtonList,
+      one_time_keyboard: true,
+      resize_keyboard: true,
+    },
+  };
+  await sendMessage(chatId, message, sendOptions);
+}
+
+/**
+ * Send Message with Reply Keyboard Removed to Telegram User
+ *
+ * @param {string} chatId
+ * @param {string} message
+ *
+ * @public
+ */
+async function sendMessageWithReplyKeyboardRemoved(chatId, message) {
+  console.log('Sending message with reply keyboard removed:', chatId);
+  const sendOptions = {
+    parse_mode: 'markdown',
+    remove_keyboard: {
+      remove_keyboard: true,
+    },
+  };
+  await sendMessage(chatId, message, sendOptions);
+}
+
+/**
+ * Send Message to List of Telegram Users.
+ *
+ * @param {array} chatIdList
+ * @param {string} message
+ *
+ * @public
+ */
+async function sendMessageToList(chatIdList, message) {
+  console.log('Sending message to list of chatIds:', chatIdList);
+
+  const waitQueue = () => new Promise((resolve) => {
+    const q = async.queue(async (chatId) => {
+      try {
+        await sendMessage(chatId, message, {
+          parse_mode: 'markdown',
+        });
+        await sleep(randomUtil.getRandomIntInclusive(100, 300));
+      } catch (error) {
+        console.log(`Unable to send message to ${chatId}`);
+      }
+    }, 15);
+
+    q.push(chatIdList);
+
+    q.drain = () => {
+      console.log('Message successfully sent to list of chatIds');
+      resolve();
+    };
+  });
+
+  await waitQueue();
+}
+
+/**
+ * Edit a specified Telegram Message
+ *
+ * @param {string} chatId
+ * @param {string} msgId
+ * @param {string} editedMessage
+ * @param {Object} options (optional)
+ *
+ * @public
+ */
+async function editMessage(chatId, msgId, editedMessage, options) {
   console.log(`Editing Message[${msgId}] for chat_id: ${chatId}`);
   let parseMode = '';
   let replyMarkup = {};
-  if(options) {
+  if (options) {
     parseMode = options.parse_mode || '';
     replyMarkup = options.force_reply || options.inline_keyboard || {};
-
   }
-  return new Promise(function(resolve, reject) {
-    const url = `${config.TELEGRAM_API_URL}/editMessageText`;
-    const options = {
-      method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: {
-        chat_id: chatId,
-        message_id: msgId,
-        text: editedMessage,
-        parse_mode: parseMode,
-        reply_markup: replyMarkup,
-      },
-      json: true,
-    };
-
-    request(options, function(error, response, body) {
-      setTimeout(() => {
-        if(!error && response.statusCode == 200) {
-          const message = 'Message Sent to chat_id: ' + chatId;
-          resolve({message: message, body: body});
-        } else {
-          reject("Failed to edit message at " + chatId + ": " + JSON.stringify(body));
-        }
-      }, 200);
-    });
-  });
+  const payload = {
+    chat_id: chatId,
+    message_id: msgId,
+    text: editedMessage,
+    parse_mode: parseMode,
+    reply_markup: replyMarkup,
+  };
+  try {
+    const result = await postToTelegram('editMessageText', payload);
+    console.log(`Message sent to ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to edit message at ${chatId}. ${error}`);
+  }
 }
 
-function editInlineKeyboardOnly(chatId, msgId, inlineKeyboardButtonList) {
-  console.log(`Editing InlineKeyboard for message[${msgId}] for chat_id: ${chatId}`);
-  return new Promise(function(resolve, reject) {
-    const url = `${config.TELEGRAM_API_URL}/editMessageReplyMarkup`;
-    const options = {
-      method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: {
-        chat_id: chatId,
-        message_id: msgId,
-        reply_markup: {
-          inline_keyboard: inlineKeyboardButtonList,
-        },
-      },
-      json: true,
-    };
-
-    request(options, function(error, response, body) {
-      setTimeout(() => {
-        if(!error && response.statusCode == 200) {
-          const message = 'Message Sent to chat_id: ' + chatId;
-          resolve({message: message, body: body});
-        } else {
-          reject("Failed to edit inline_keyboard at " + chatId + ": " + JSON.stringify(body));
-        }
-      }, 200);
-    });
-  });
-}
-
-function sendMessageWithReply(chatId, message, replyType, replyTypeData) {
-  console.log("Forcing reply on message to be sent: " + chatId);
-
-  sendMessage(chatId, message, {'parse_mode': 'markdown', 'force_reply': {'force_reply': true}}).then((result) => {
-    console.log(result.message);
-    messageId = result.body.result.message_id;
-    console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${replyType}`)
-    const cacheValue = {
-      type: replyType,
-      data: replyTypeData,
-    }
-    cacheProvider.instance().set(messageId, cacheValue, config.CACHE_DURATION, function(err, success) {
-      if (success) {
-        console.log("Cache successfully set");
-        console.log("List of cache keys: " + cacheProvider.instance().keys());
-      } else {
-        console.log(err);
-      }
-    })
-  }).catch((error) => {
-    console.log(error);
-  });
-}
-
-function sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList, callbackQueryType, callbackQueryTypeValue) {
-  console.log("Sending message with inline keyoard: " + chatId);
+/**
+ * Edit a specified Telegram Message with Inline Keyboard and Message
+ *
+ * @param {string} chatId
+ * @param {string} msgId
+ * @param {string} editedMessage
+ * @param {Array} editedInlineKeyboardButtonList
+ *
+ * @public
+ */
+async function editMessageWithInlineKeyboard(
+  chatId,
+  msgId,
+  editedMessage,
+  editedInlineKeyboardButtonList,
+) {
+  console.log('Editing message with inline keyboard:', chatId);
   const sendOptions = {
-    'parse_mode': 'markdown',
-    'inline_keyboard' : {
-      'inline_keyboard': inlineKeyboardButtonList,
-    }
+    parse_mode: 'markdown',
+    inline_keyboard: {
+      inline_keyboard: editedInlineKeyboardButtonList,
+    },
+  };
+  await editMessage(chatId, msgId, editedMessage, sendOptions);
+}
+
+/**
+ * Edit a specified Telegram Message with only Inline Keyboard
+ *
+ * @param {string} chatId
+ * @param {string} msgId
+ * @param {Array} inlineKeyboardButtonList
+ *
+ * @public
+ */
+async function editInlineKeyboardOnly(chatId, msgId, inlineKeyboardButtonList) {
+  console.log(`Editing InlineKeyboard for message[${msgId}] for chat_id: ${chatId}`);
+  const payload = {
+    chat_id: chatId,
+    message_id: msgId,
+    reply_markup: {
+      inline_keyboard: inlineKeyboardButtonList,
+    },
+  };
+  try {
+    const result = await postToTelegram('editMessageReplyMarkup', payload);
+    console.log(`Message sent to ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to edit inline_keyboard at ${chatId}. ${error}`);
   }
-  sendMessage(chatId, message, sendOptions).then((result) => {
-    console.log(result.message);
-    messageId = result.body.result.message_id;
-    console.log(`Setting cache for ${chatId} with cache key: ${messageId} and cache value: ${callbackQueryType}`)
-    const cacheValue = {
-      type: callbackQueryType,
-      data: callbackQueryTypeValue,
-    }
-    cacheProvider.instance().set(messageId, cacheValue, config.CACHE_DURATION, function(err, success) {
-      if (success) {
-        console.log("Cache successfully set");
-        console.log("List of cache keys: " + cacheProvider.instance().keys());
-      } else {
-        console.log(err);
-      }
-    })
-  }).catch((error) => {
+}
+
+/**
+ * Sends a Chat Action to a Telegram User
+ * Available Actions: typing, upload_photo, record_video, upload_video,
+ * record_audio, upload_audio, upload_document, find_location, record_video_note,
+ * upload_video_note
+ *
+ * @param {string} chatId
+ * @param {string} actionToSend
+ *
+ * @public
+ */
+async function sendChatAction(chatId, actionToSend) {
+  console.log(`Sending chat action (${actionToSend}) to chat_id: ${chatId}`);
+  const payload = {
+    chat_id: chatId,
+    action: actionToSend,
+  };
+  try {
+    const result = await postToTelegram('sendChatAction', payload);
+    console.log(`Message sent to ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send chat action to ${chatId}. ${error}`);
+  }
+}
+
+/**
+ * Send Answer Callback Query to Telegram User.
+ * Use this method whenever the Telegram User clicks on a button.
+ *
+ * @param {string} callbackQueryId
+ * @param {object} callbackOptions
+ *
+ * @public
+ */
+async function sendAnswerCallbackQuery(callbackQueryId, callbackOptions) {
+  console.log(`Sending answer callback query (${JSON.stringify(callbackOptions)}) to callback query: ${callbackQueryId}`);
+  let payload = {
+    callback_query_id: callbackQueryId,
+    cache_time: 10,
+  };
+  if (callbackOptions) {
+    payload = Object.assign({}, payload, callbackOptions);
+  }
+  try {
+    const result = await postToTelegram('answerCallbackQuery', payload);
+    console.log(`Answer Callback Query sent to callback_query_id: ${callbackQueryId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send answer callback query to ${callbackQueryId}. ${error}`);
+  }
+}
+
+/**
+ * Send a Photo to a Telegram User
+ * @param {string} chatId
+ * @param {string} imgUrl
+ *
+ * @public
+ */
+async function sendPhoto(chatId, imgUrl) {
+  console.log(`Sending photo (${imgUrl}) to ${chatId}`);
+  await sendChatAction(chatId, 'upload_photo').catch((error) => {
     console.log(error);
-  })
+  });
+  const payload = {
+    chat_id: chatId,
+    photo: imgUrl,
+  };
+  try {
+    const result = await postToTelegram('sendPhoto', payload);
+    console.log(`Photo Sent to chat_id: ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send photo to ${chatId}. ${error}`);
+  }
 }
 
-function sendChatAction(chatId, action) {
-  console.log(`Sending chat action (${action}) to chat_id: ${chatId}`);
-  return new Promise(function(resolve, reject) {
-    const url = `${config.TELEGRAM_API_URL}/sendChatAction`;
-    const options = {
-      method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: {
-        chat_id: chatId,
-        action: action,
-      },
-      json: true,
-    };
-
-    request(options, function(error, response, body) {
-      if(!error && response.statusCode == 200) {
-        const message = 'Chat action sent to chat_id: ' + chatId;
-        resolve(message);
-      } else {
-        reject(error);
-      }
-    });
-  });
-}
-
-function sendAnswerCallbackQuery(callbackQueryId, options) {
-  console.log(`Sending answer callback query (${options}) to callback query: ${callbackQueryId}`);
-  const callbackOptions = options;
-  return new Promise(function(resolve, reject) {
-    let payload = {
-      callback_query_id: callbackQueryId
-    }
-    if(callbackOptions) {
-      payload = Object.assign({}, payload, callbackOptions);
-    }
-    const url = `${config.TELEGRAM_API_URL}/answerCallbackQuery`;
-    const options = {
-      method: 'post',
-      url: url,
-      headers: {'content-type': 'application/json' },
-      body: payload,
-      json: true,
-    };
-
-    request(options, function(error, response, body) {
-      if(!error && response.statusCode == 200) {
-        const message = 'Answer Callback Query sent to callback_query_id: ' + callbackQueryId;
-        resolve(message);
-      } else {
-        reject(error);
-      }
-    });
-  });
-}
-
-async function sendMessageToList(chatIdList, message) {
-  console.log("Sending message to list of chatIds " + chatIdList);
-  return new Promise(async function(resolve, reject) {
-    try {
-      for(var i=0; i<chatIdList.length; i++) {
-        await sendMessage(chatId, message, {'parse_mode': 'markdown'})
-      }
-      resolve('Message successfully sent to list of chatIds');
-    } catch(error) {
-      reject(error)
-    }
-  });
+/**
+ * Send response to Inline Query by a Telegram User
+ *
+ * @param {string} inlineQueryId
+ * @param {Array} resultList
+ *
+ * @public
+ */
+async function sendAnswerInlineQuery(inlineQueryId, resultList) {
+  console.log(`Sending answer to inline query ${inlineQueryId}`);
+  const payload = {
+    inline_query_id: inlineQueryId,
+    results: resultList,
+  };
+  try {
+    const result = await postToTelegram('answerInlineQuery', payload);
+    console.log(`Answer sent to inline query: ${inlineQueryId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send answer to inline query ${inlineQueryId}. ${error}`);
+  }
 }
 
 module.exports = {
   setWebHook,
   sendMessage,
   editMessage,
+  editMessageWithInlineKeyboard,
   editInlineKeyboardOnly,
   sendMessageWithReply,
   sendMessageWithInlineKeyboard,
   sendMessageToList,
   sendChatAction,
   sendAnswerCallbackQuery,
-}
+  sendPhoto,
+  sendAnswerInlineQuery,
+  sendMessageWithReplyKeyboard,
+  sendMessageWithReplyKeyboardRemoved,
+};

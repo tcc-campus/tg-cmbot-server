@@ -7,12 +7,20 @@ module.exports = {
   PLATFORM_URL: `${process.env.PLATFORM_URL}/platform${process.env.BOT_TOKEN}`,
   CACHE_DURATION: 600,
   DEV_GROUP_ID: process.env.DEV_GROUP_ID,
-  postgres: {
-    username: POSTGRES_USERNAME,
-    password: POSTGRES_PASSWORD,
-    host: POSTGRES_HOST,
-    port: POSTGRES_PORT,
-    database: POSTGRES_DATABASE,
-    applicationName: APPLICATION_NAME,
+  POSTGRES: {
+    username: process.env.POSTGRES_USERNAME,
+    password: process.env.POSTGRES_PASSWORD,
+    host: process.env.POSTGRES_HOST,
+    port: process.env.POSTGRES_PORT,
+    database: process.env.POSTGRES_DATABASE,
+    applicationName: process.env.APPLICATION_NAME,
   },
+  GOOGLE: {
+    serviceAcctId: process.env.GOOGLE_CAL_ACCT,
+    key: process.env.GOOGLE_CAL_KEY.replace(/\\n/g, '\n'),
+    timezone: 'UTC+08:00',
+    calendarId: {
+    	'primary': process.env.GOOGLE_CAL_ID,
+    },
+  }
 }

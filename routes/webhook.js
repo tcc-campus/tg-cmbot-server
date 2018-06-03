@@ -1,6 +1,5 @@
 const express = require('express');
 const request = require('request');
-const config = require('../config');
 const evtHandler = require('../handlers/eventHandler');
 var router = express.Router();
 
