@@ -11,6 +11,7 @@
     "url": "git+https://github.com/tcc-campus/tg-cmbot-server.git"
   },
   "dependencies": {
+    "apikey": "^0.1.2",
     "async": "^2.6.1",
     "await-sleep": "0.0.1",
     "axios": "^0.18.0",

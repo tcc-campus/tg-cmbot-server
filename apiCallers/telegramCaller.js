@@ -173,15 +173,22 @@ async function sendMessageWithReplyKeyboardRemoved(chatId, message) {
  *
  * @public
  */
-async function sendMessageToList(chatIdList, message) {
+async function sendMessageToList(chatIdList, message, options) {
   console.log('Sending message to list of chatIds:', chatIdList);
 
   const waitQueue = () => new Promise((resolve) => {
     const q = async.queue(async (chatId) => {
       try {
-        await sendMessage(chatId, message, {
-          parse_mode: 'markdown',
-        });
+        if (options && options['image_url']) {
+          await sendPhoto(chatId, options['image_url']);
+        }
+        if (options && options['inline_keyboard']) {
+          await sendMessageWithInlineKeyboard(chatId, message, options['inline_keyboard']);
+        } else {
+          await sendMessage(chatId, message, {
+            parse_mode: 'markdown',
+          });
+        }
         await sleep(randomUtil.getRandomIntInclusive(100, 300));
       } catch (error) {
         console.log(`Unable to send message to ${chatId}`);

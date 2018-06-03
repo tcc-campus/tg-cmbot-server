@@ -7,7 +7,7 @@ const request = require('request');
 
 const index = require('./routes/index');
 const webhook = require('./routes/webhook');
-const platform = require('./routes/platform');
+const event = require('./routes/event');
 
 const tgCaller = require('./apiCallers/telegramCaller');
 const config = require('./config');
@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 app.use('/', index);
 app.use(`/bot${config.BOT_TOKEN}`, webhook);
-app.use(`/platform${config.BOT_TOKEN}`, platform);
+app.use(`/event`, event);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
