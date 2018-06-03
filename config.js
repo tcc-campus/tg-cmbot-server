@@ -7,6 +7,7 @@ module.exports = {
   PLATFORM_URL: `${process.env.PLATFORM_URL}/platform${process.env.BOT_TOKEN}`,
   CACHE_DURATION: 600,
   DEV_GROUP_ID: process.env.DEV_GROUP_ID,
+  SLACK_WEBHOOK: process.env.SLACK_WEBHOOK,
   POSTGRES: {
     username: process.env.POSTGRES_USERNAME,
     password: process.env.POSTGRES_PASSWORD,
