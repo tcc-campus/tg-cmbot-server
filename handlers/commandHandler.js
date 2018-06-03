@@ -37,9 +37,9 @@ function handleCommand(chatId, msgObj, command) {
   }
 }
 
-function handleStart(chatId, firstName) {
+async function handleStart(chatId, firstName) {
   const message = `Hello ${firstName}! I'm Campus Ministry Bot. Type /help or click on the slash button below to know the commands you can use!`;
-  tgCaller.sendMessage(chatId, message).catch((error) => {
+  await tgCaller.sendMessage(chatId, message).catch((error) => {
     console.log(error);
   });
 }
@@ -79,23 +79,23 @@ async function handleUnsubscribe(chatId, firstName) {
   }
 }
 
-function handleFeedback(chatId) {
+async function handleFeedback(chatId) {
   const message = 'Please let me know how I can improve by replying to this message 🙏🏻';
   await tgCaller.sendMessageWithReply(chatId, message).catch((error) => {
     console.log(error);
   });
 }
 
-function handleHelp(chatId) {
+async function handleHelp(chatId) {
   const message = 'I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n/feedback - Give me feedback\n/help - Get help!';
-  tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
+  await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
     console.log(error);
   });
 }
 
-function handleUnknownCommand(chatId) {
+async function handleUnknownCommand(chatId) {
   const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands! 😁";
-  tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
+  await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
     console.log(error);
   });
 }
