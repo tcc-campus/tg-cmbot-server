@@ -5,8 +5,12 @@ const config = require('../config');
 const postgres = config.POSTGRES;
 
 const {
-  Cells,
-} = require('./cells');
+  AttendancePolls,
+} = require('./attendancePolls');
+
+const {
+  Users,
+} = require('./users');
 
 const sequelize = new Sequelize(postgres.database, postgres.username, postgres.password, {
   port: postgres.port,
@@ -18,37 +22,35 @@ const sequelize = new Sequelize(postgres.database, postgres.username, postgres.p
   },
 });
 
-const Users = sequelize.define('users', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-  },
-  telegram_id: {
-    type: Sequelize.BIGINT,
-  },
-  telegram_name: {
-    type: Sequelize.CHAR,
-  },
-  cell_id: {
+const Attendances = sequelize.define('attendances', {
+  user_id: {
     type: Sequelize.INTEGER,
   },
-  leadership: {
-    type: Sequelize.CHAR,
+  attendance_poll_id: {
+    type: Sequelize.INTEGER,
+  },
+  is_attending: {
+    type: Sequelize.BOOLEAN,
   },
 }, {
   timestamps: true,
   createdAt: 'creation_date',
   updatedAt: 'modified_date',
   freezeTableName: true,
-  tableName: 'users',
+  tableName: 'attendances',
 });
 
-Users.belongsTo(Cells, {
-  foreignKey: 'cell_id',
+
+Attendances.belongsTo(AttendancePolls, {
+  foreignKey: 'attendance_poll_id',
+  targetKey: 'id',
+});
+
+Attendances.belongsTo(Users, {
+  foreignKey: 'user_id',
   targetKey: 'id',
 });
 
 module.exports = {
-  Users,
+  Attendances,
 };
