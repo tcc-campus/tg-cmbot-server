@@ -5,6 +5,7 @@
 
 const tgCaller = require('../apiCallers/telegramCaller');
 const pfCaller = require('../apiCallers/platformCaller');
+const subService = require('../services/subscriptionService');
 const cUtil = require('../utils/cacheUtil');
 const upcomingUtil = require('../utils/upcomingUtil');
 
@@ -19,11 +20,8 @@ function handleCommand(chatId, msgObj, command) {
     case 'upcoming':
       handleUpcoming(chatId);
       break;
-    case 'subscribe':
-      handleSubscribe(chatId, firstName);
-      break;
-    case 'unsubscribe':
-      handleUnsubscribe(chatId, firstName);
+    case 'subscription':
+      handleSubscription(chatId, firstName);
       break;
     case 'feedback':
       handleFeedback(chatId);
@@ -48,6 +46,10 @@ async function handleUpcoming(chatId) {
   const message = await upcomingUtil.getMessage('main_menu');
   const inlineKeyboardButtonList = await upcomingUtil.getInlineKeyboard('main_menu');
   tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList);
+}
+
+function handleSubscription(chatId, firstName) {
+  subService.sendSubscriptionDetails(chatId, firstName);
 }
 
 async function handleSubscribe(chatId, firstName) {
@@ -87,7 +89,7 @@ async function handleFeedback(chatId) {
 }
 
 async function handleHelp(chatId) {
-  const message = 'I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n/feedback - Give me feedback\n/help - Get help!';
+  const message = 'I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscription - Manage your subscription details\n/feedback - Give me feedback\n/help - Get help!';
   await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
     console.log(error);
   });

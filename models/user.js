@@ -5,8 +5,8 @@ const config = require('../config');
 const postgres = config.POSTGRES;
 
 const {
-  Cells,
-} = require('./cells');
+  Cell,
+} = require('./cell');
 
 const sequelize = new Sequelize(postgres.database, postgres.username, postgres.password, {
   port: postgres.port,
@@ -15,10 +15,11 @@ const sequelize = new Sequelize(postgres.database, postgres.username, postgres.p
   dialect: 'postgres',
   dialectOptions: {
     application_name: postgres.applicationName,
+    ssl: true,
   },
 });
 
-const Users = sequelize.define('users', {
+const User = sequelize.define('users', {
   id: {
     primaryKey: true,
     type: Sequelize.INTEGER,
@@ -36,6 +37,9 @@ const Users = sequelize.define('users', {
   leadership: {
     type: Sequelize.CHAR,
   },
+  is_subscribed: {
+    type: Sequelize.BOOLEAN,
+  },
 }, {
   timestamps: true,
   createdAt: 'creation_date',
@@ -44,11 +48,11 @@ const Users = sequelize.define('users', {
   tableName: 'users',
 });
 
-Users.belongsTo(Cells, {
+User.belongsTo(Cell, {
   foreignKey: 'cell_id',
   targetKey: 'id',
 });
 
 module.exports = {
-  Users,
+  User,
 };

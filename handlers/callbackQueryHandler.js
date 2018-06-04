@@ -9,10 +9,12 @@ const evtFormatter = require('../utils/eventFormatter');
 const msgFormatter = require('../utils/messageFormatter');
 const tgCaller = require('../apiCallers/telegramCaller');
 const evtService = require('../services/eventService');
+const subService = require('../services/subscriptionService');
 
 const types = {
   UPCOMING: 'upcoming',
   EVENT: 'event',
+  SUBSCRIPTION: 'subscription'
 };
 
 async function handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbackQueryData) {
@@ -45,6 +47,22 @@ async function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, c
   } catch (error) {
     console.log('Error handling Upcoming Event Detail Callback Query:', error);
     await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+  }
+}
+
+async function handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData) {
+  console.log('Handling subscription event callback query');
+  const type = callbackQueryData.shift();
+  switch(type) {
+    case 'unsubscribe':
+      await subService.updateUserSubscription(chatId, messageId, callbackQueryId, false);
+      break;
+    case 'subscribe':
+      await subService.updateUserSubscription(chatId, messageId, callbackQueryId, true);
+      break;
+    default:
+      await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+      break;
   }
 }
 
@@ -82,6 +100,9 @@ function handleCallbackQueryEvent(callbackQueryObj) {
       break;
     case types.EVENT:
       handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, callbackQueryData);
+      break;
+    case types.SUBSCRIPTION:
+      handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
       break;
     default:
       console.log('Unknown callback query type');

@@ -11,20 +11,24 @@ const axios = require('axios');
  *
  * @private
  */
-async function postToSlack(data) {
+async function postToSlack(url, data, token) {
   const payload = Object.assign({
     username: 'CampusBot',
     icon_emoji: ':robot_face:',
   }, data);
+  const options = {
+    url: url,
+    method: 'post',
+    headers: {
+      'content-type': 'application/json',
+    },
+    data: payload,
+  }
+  if (token) {
+    options.headers.Authorization = `Bearer ${token}`;
+  }
   try {
-    const response = await axios({
-      url: config.SLACK_WEBHOOK,
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: payload,
-    });
+    const response = await axios(options);
     if (response.status !== 200) {
       throw new Error(JSON.stringify(response.data));
     }
@@ -34,6 +38,17 @@ async function postToSlack(data) {
   }
 }
 
+async function postToDevelopersChannel(data) {
+  await postToSlack(config.SLACK_WEBHOOK, data)
+}
+
+async function postToSlackApi(endpoint, data) {
+  const token = config.SLACK_BOT_TOKEN;
+  const response = await postToSlack(`https://slack.com/api/${endpoint}`, data, token);
+  return response;
+}
+
 module.exports = {
-  postToSlack,
+  postToDevelopersChannel,
+  postToSlackApi
 };

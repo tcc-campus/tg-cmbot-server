@@ -14,26 +14,29 @@ const sequelize = new Sequelize(postgres.database, postgres.username, postgres.p
   },
 });
 
-const Cells = sequelize.define('cells', {
+const AttendancePoll = sequelize.define('attendancePolls', {
   id: {
     primaryKey: true,
     type: Sequelize.INTEGER,
     autoIncrement: true,
   },
-  cell_name: {
+  google_cal_id: {
     type: Sequelize.CHAR,
   },
-  section_name: {
+  poll_message: {
     type: Sequelize.CHAR,
   },
+  poll_image_url: {
+    type: Sequelize.CHAR,
+  }
 }, {
   timestamps: true,
   createdAt: 'creation_date',
   updatedAt: 'modified_date',
   freezeTableName: true,
-  tableName: 'cells',
+  tableName: 'attendance_polls',
 });
 
 module.exports = {
-  Cells,
+  AttendancePoll,
 };

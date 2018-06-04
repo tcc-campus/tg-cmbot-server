@@ -8,6 +8,7 @@ const request = require('request');
 const index = require('./routes/index');
 const webhook = require('./routes/webhook');
 const event = require('./routes/event');
+const slack = require('./routes/slack');
 
 const tgCaller = require('./apiCallers/telegramCaller');
 const config = require('./config');
@@ -25,7 +26,8 @@ app.use(cookieParser());
 
 app.use('/', index);
 app.use(`/bot${config.BOT_TOKEN}`, webhook);
-app.use(`/event`, event);
+app.use('/event', event);
+app.use('/slack', slack);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
