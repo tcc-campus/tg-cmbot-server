@@ -1,13 +1,9 @@
-/* Modules to format messages
-*   Exported Modules:
-*     1. formatUpcomingMessage(formattedEventList, requestedMonth): For formatting
-*        messages for the /upcoming command
-*     2. formatEventDetail(eventObj): For formatting message for event detail
-*/
-
+/**
+ * Formatter for event messages and inline keyboards
+ */
 const moment = require('moment');
 
-function formatUpcomingMessage(formattedEventList, requestedMonth) {
+function getMessageForUpcomingEventList(formattedEventList, requestedMonth) {
   console.log('Formatting upcoming message');
   let requestedMonthString = '';
   switch (requestedMonth) {
@@ -40,7 +36,7 @@ function formatUpcomingMessage(formattedEventList, requestedMonth) {
   return upcomingMessage;
 }
 
-function formatEventDetail(eventObj) {
+function getMessageForUpcomingEventDetail(eventObj) {
   let eventDetailMessage = '';
   if (eventObj.event_message) {
     eventDetailMessage += `${eventObj.event_message}\n`;
@@ -56,7 +52,26 @@ function formatEventDetail(eventObj) {
   return eventDetailMessage;
 }
 
+function getInlineKeyboardForEventDetail(eventList) {
+  const inlineKeyboardButtonList = [];
+  const listSize = eventList.length;
+  console.log(`Getting event detail inline keyboard object for event list size: ${listSize}`);
+  let rowIndex = -1;
+  for (let i = 0; i < listSize; i += 1) {
+    if (i % 5 === 0) {
+      inlineKeyboardButtonList.push([]);
+      rowIndex += 1;
+    }
+    inlineKeyboardButtonList[rowIndex].push({
+      text: i + 1,
+      callback_data: `event/${eventList[i].id}`,
+    });
+  }
+  return inlineKeyboardButtonList;
+}
+
 module.exports = {
-  formatUpcomingMessage,
-  formatEventDetail,
+  getMessageForUpcomingEventDetail,
+  getMessageForUpcomingEventList,
+  getInlineKeyboardForEventDetail,
 };

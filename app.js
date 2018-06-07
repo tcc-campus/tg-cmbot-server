@@ -15,6 +15,7 @@ const config = require('./config');
 const cacheProvider = require('./cache/cacheProvider');
 const cronSetup = require('./crons/cronSetup');
 const evtService = require('./services/eventService');
+const sbService = require('./services/subscriptionService');
 
 const app = express();
 
@@ -61,6 +62,9 @@ async function init() {
 
     // Set all events in cache
     evtService.setAll();
+
+    // Set all cells in cache
+    sbService.setSectionCellList();
   } catch (error) {
     console.log(error);
   }

@@ -4,9 +4,8 @@
 */
 
 const dtUtil = require('../utils/dateTimeUtil');
-const cUtil = require('../utils/cacheUtil');
-const evtFormatter = require('../utils/eventFormatter');
-const msgFormatter = require('../utils/messageFormatter');
+const evtFormatter = require('../formatters/eventFormatter');
+const subFormatter = require('../formatters/subscriptionFormatter');
 const tgCaller = require('../apiCallers/telegramCaller');
 const evtService = require('../services/eventService');
 const subService = require('../services/subscriptionService');
@@ -14,7 +13,8 @@ const subService = require('../services/subscriptionService');
 const types = {
   UPCOMING: 'upcoming',
   EVENT: 'event',
-  SUBSCRIPTION: 'subscription'
+  SUBSCRIPTION: 'subscription',
+  USER: 'user',
 };
 
 async function handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbackQueryData) {
@@ -23,11 +23,14 @@ async function handleUpcomingMonthCallbackQuery(chatId, callbackQueryId, callbac
   const dateString = dtUtil.getDateStringForMonth(requestedMonth);
   console.log(`Month selected: ${dateString}`);
   try {
-    await Promise.all([tgCaller.sendChatAction(chatId, 'typing'), tgCaller.sendAnswerCallbackQuery(callbackQueryId)]);
+    await Promise.all([
+      tgCaller.sendChatAction(chatId, 'typing'),
+      tgCaller.sendAnswerCallbackQuery(callbackQueryId),
+    ]);
     const eventList = await evtService.getByMonth(dateString);
-    const message = await msgFormatter.formatUpcomingMessage(eventList, requestedMonth);
-    const inlineKeyboardButtonList = getEventDetailInlineKeyboard(eventList);
-    console.log(inlineKeyboardButtonList)
+    const message = evtFormatter.getMessageForUpcomingEventList(eventList, requestedMonth);
+    const inlineKeyboardButtonList = evtFormatter.getInlineKeyboardForEventDetail(eventList);
+    console.log(inlineKeyboardButtonList);
     await tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList);
   } catch (error) {
     console.log('Error handling Upcoming Month Callback Query:', error);
@@ -39,10 +42,13 @@ async function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, c
   console.log('Handling upcoming event detail callback query');
   const eventId = callbackQueryData.shift();
   try {
-    await Promise.all([tgCaller.sendChatAction(chatId, 'typing'), tgCaller.sendAnswerCallbackQuery(callbackQueryId)]);
+    await Promise.all([
+      tgCaller.sendChatAction(chatId, 'typing'),
+      tgCaller.sendAnswerCallbackQuery(callbackQueryId),
+    ]);
     const event = await evtService.getById(eventId);
     console.log(event);
-    const message = msgFormatter.formatEventDetail(event);
+    const message = evtFormatter.getMessageForUpcomingEventDetail(event);
     await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' });
   } catch (error) {
     console.log('Error handling Upcoming Event Detail Callback Query:', error);
@@ -50,15 +56,31 @@ async function handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, c
   }
 }
 
-async function handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData) {
+async function handleSubscriptionCallbackQuery(
+  chatId,
+  messageId,
+  callbackQueryId,
+  callbackQueryData,
+  firstName,
+) {
   console.log('Handling subscription event callback query');
   const type = callbackQueryData.shift();
-  switch(type) {
+  switch (type) {
     case 'unsubscribe':
       await subService.updateUserSubscription(chatId, messageId, callbackQueryId, false);
       break;
     case 'subscribe':
       await subService.updateUserSubscription(chatId, messageId, callbackQueryId, true);
+      break;
+    case 'main_menu':
+      try {
+        await Promise.all([
+          subService.sendSubscriptionDetails(chatId, firstName),
+          tgCaller.sendAnswerCallbackQuery(callbackQueryId),
+        ]);
+      } catch (error) {
+        console.log(error);
+      }
       break;
     default:
       await tgCaller.sendAnswerCallbackQuery(callbackQueryId);
@@ -66,22 +88,41 @@ async function handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryI
   }
 }
 
-function getEventDetailInlineKeyboard(eventList) {
-  const inlineKeyboardButtonList = [];
-  const listSize = eventList.length;
-  console.log(`Getting event detail inline keyboard object for event list size: ${listSize}`);
-  let rowIndex = -1;
-  for (let i = 0; i < listSize; i++) {
-    if (i % 5 === 0) {
-      inlineKeyboardButtonList.push([]);
-      rowIndex += 1;
+async function handleUserCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData) {
+  let inlineKeyboard = [];
+  try {
+    const action = callbackQueryData.shift();
+    if (action === 'edit') {
+      const sectionName = callbackQueryData.shift();
+      const cellId = callbackQueryData.shift();
+      if (cellId) {
+        await subService.updateUserCell(chatId, messageId, callbackQueryId, cellId);
+      } else if (sectionName) {
+        if (sectionName === 'uncelled') {
+          const uncelledCellId = await subService.getCellId(sectionName);
+          await subService.updateUserCell(chatId, messageId, callbackQueryId, uncelledCellId);
+        } else {
+          tgCaller.sendAnswerCallbackQuery(callbackQueryId);
+          const sectionObj = await subService.getSectionObj(sectionName);
+          inlineKeyboard = await subFormatter.getInlineKeyboardForCellSelection(
+            sectionName,
+            sectionObj,
+          );
+          tgCaller.editInlineKeyboardOnly(chatId, messageId, inlineKeyboard);
+        }
+      } else {
+        let sectionList = [];
+        [sectionList] = await Promise.all([
+          subService.getSectionList(),
+          tgCaller.sendAnswerCallbackQuery(callbackQueryId),
+        ]);
+        inlineKeyboard = subFormatter.getInlineKeyboardForSectionSelection(sectionList);
+        tgCaller.editInlineKeyboardOnly(chatId, messageId, inlineKeyboard);
+      }
     }
-    inlineKeyboardButtonList[rowIndex].push({
-      text: i + 1,
-      callback_data: `event/${eventList[i].id}`,
-    });
+  } catch (error) {
+    console.log(error);
   }
-  return inlineKeyboardButtonList;
 }
 
 function handleCallbackQueryEvent(callbackQueryObj) {
@@ -102,10 +143,20 @@ function handleCallbackQueryEvent(callbackQueryObj) {
       handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, callbackQueryData);
       break;
     case types.SUBSCRIPTION:
-      handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
+      handleSubscriptionCallbackQuery(
+        chatId,
+        messageId,
+        callbackQueryId,
+        callbackQueryData,
+        firstName,
+      );
+      break;
+    case types.USER:
+      handleUserCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
       break;
     default:
       console.log('Unknown callback query type');
+      tgCaller.sendAnswerCallbackQuery(callbackQueryId);
       break;
   }
 }

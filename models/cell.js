@@ -11,6 +11,7 @@ const sequelize = new Sequelize(postgres.database, postgres.username, postgres.p
   dialect: 'postgres',
   dialectOptions: {
     application_name: postgres.applicationName,
+    ssl: true,
   },
 });
 

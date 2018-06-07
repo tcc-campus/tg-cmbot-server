@@ -11,7 +11,6 @@ const gCaller = require('../apiCallers/googleCaller');
 // cache
 const CACHE_TTL = 60 * 60 * 24 * 7;
 
-
 /**
  * Updates Date Cache
  *
@@ -22,7 +21,10 @@ const CACHE_TTL = 60 * 60 * 24 * 7;
 async function updateDatesCache(eventsData) {
   const dates = {};
   eventsData.forEach((event) => {
-    const month = moment.tz(event.event_date_raw, 'Asia/Singapore').startOf('month').format('YYYY-MM');
+    const month = moment
+      .tz(event.event_date_raw, 'Asia/Singapore')
+      .startOf('month')
+      .format('YYYY-MM');
     if (Object.prototype.hasOwnProperty.call(dates, month)) {
       dates[month].push(event);
     } else {
@@ -74,17 +76,20 @@ async function updateEventsCache(eventsData) {
 }
 
 /**
-  * Update events in cache.
-  *
-  * @public
-  */
+ * Update events in cache.
+ *
+ * @public
+ */
 async function setAll() {
   try {
     console.log('Getting events data from Google Cal');
     const eventsData = await gCaller.getAllEvents();
     const formattedEventsData = evtFormatter.formatEventList(eventsData);
     console.log('Setting events data in cache');
-    await Promise.all([updateDatesCache(formattedEventsData), updateEventsCache(formattedEventsData)]);
+    await Promise.all([
+      updateDatesCache(formattedEventsData),
+      updateEventsCache(formattedEventsData),
+    ]);
   } catch (error) {
     console.log('Error in setting events data in cache', error);
     throw new Error();
