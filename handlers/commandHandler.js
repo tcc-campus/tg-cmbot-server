@@ -4,38 +4,8 @@
 */
 
 const tgCaller = require('../apiCallers/telegramCaller');
-const pfCaller = require('../apiCallers/platformCaller');
-const cUtil = require('../utils/cacheUtil');
+const subService = require('../services/subscriptionService');
 const upcomingUtil = require('../utils/upcomingUtil');
-
-function handleCommand(chatId, msgObj, command) {
-  console.log(`Handling Command: ${command}`);
-  const firstName = msgObj.chat.first_name ? msgObj.chat.first_name : '';
-
-  switch (command) {
-    case 'start':
-      handleStart(chatId, firstName);
-      break;
-    case 'upcoming':
-      handleUpcoming(chatId);
-      break;
-    case 'subscribe':
-      handleSubscribe(chatId, firstName);
-      break;
-    case 'unsubscribe':
-      handleUnsubscribe(chatId, firstName);
-      break;
-    case 'feedback':
-      handleFeedback(chatId);
-      break;
-    case 'help':
-      handleHelp(chatId);
-      break;
-    default:
-      handleUnknownCommand(chatId);
-      break;
-  }
-}
 
 async function handleStart(chatId, firstName) {
   const message = `Hello ${firstName}! I'm Campus Ministry Bot. Type /help or click on the slash button below to know the commands you can use!`;
@@ -50,33 +20,8 @@ async function handleUpcoming(chatId) {
   tgCaller.sendMessageWithInlineKeyboard(chatId, message, inlineKeyboardButtonList);
 }
 
-async function handleSubscribe(chatId, firstName) {
-  const successMessage = `Thanks for subscribing, ${firstName}! I'll keep you updated on upcoming Campus Ministry Events. Type /unsubscribe if you no longer want updates. God Bless!`;
-  const failureMessage = `I'm sorry, ${firstName}, there was an error registering your subscription. Please try again!`;
-
-  console.log(`Sending new subscriber request to backend: ${chatId}, ${firstName}`);
-  try {
-    await pfCaller.postSubscriber(chatId, firstName);
-    await tgCaller.sendMessage(chatId, successMessage);
-  } catch (error) {
-    console.log(error);
-    await tgCaller.sendMessage(chatId, failureMessage);
-  }
-}
-
-async function handleUnsubscribe(chatId, firstName) {
-  const successMessage = `Sure, ${firstName}, I will stop sending you updates. You can always type /subscribe if you want me to update you again! God Bless!`;
-  const failureMessage = `I'm sorry, ${firstName}, there was an error unsubscribing you from my list. Please try again!`;
-
-  console.log(`Sending unsubscribe request to backend for id: ${chatId}`);
-
-  try {
-    await pfCaller.deleteSubscriber(chatId);
-    await tgCaller.sendMessage(chatId, successMessage);
-  } catch (error) {
-    console.log(error);
-    await tgCaller.sendMessage(chatId, failureMessage);
-  }
+function handleSubscription(chatId, firstName) {
+  subService.sendSubscriptionDetails(chatId, firstName);
 }
 
 async function handleFeedback(chatId) {
@@ -87,17 +32,45 @@ async function handleFeedback(chatId) {
 }
 
 async function handleHelp(chatId) {
-  const message = 'I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscribe - Subscribe to push notifications on upcoming Campus Events \n/unsubscribe - Unsubscribe from push notifications\n/feedback - Give me feedback\n/help - Get help!';
+  const message =
+    'I can give you reminders on Campus Ministry Events or let you know about upcoming events.😁 \n\n*Available Commands:*\n/upcoming - Get a list of upcoming events\n/subscription - Manage your subscription details\n/feedback - Give me feedback\n/help - Get help!';
   await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
     console.log(error);
   });
 }
 
 async function handleUnknownCommand(chatId) {
-  const message = "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands! 😁";
+  const message =
+    "Sorry, I don't understand this command. Type /help or click on the slash button below to get the list of available commands! 😁";
   await tgCaller.sendMessage(chatId, message, { parse_mode: 'markdown' }).catch((error) => {
     console.log(error);
   });
+}
+
+function handleCommand(chatId, msgObj, command) {
+  console.log(`Handling Command: ${command}`);
+  const firstName = msgObj.chat.first_name ? msgObj.chat.first_name : '';
+
+  switch (command) {
+    case 'start':
+      handleStart(chatId, firstName);
+      break;
+    case 'upcoming':
+      handleUpcoming(chatId);
+      break;
+    case 'subscription':
+      handleSubscription(chatId, firstName);
+      break;
+    case 'feedback':
+      handleFeedback(chatId);
+      break;
+    case 'help':
+      handleHelp(chatId);
+      break;
+    default:
+      handleUnknownCommand(chatId);
+      break;
+  }
 }
 
 module.exports = {

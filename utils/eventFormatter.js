@@ -6,15 +6,20 @@
 */
 
 const crypto = require('crypto-js');
+const breakdance = require('breakdance');
 const moment = require('moment-timezone');
 
 function formatEvent(event) {
   var startDateTimeObj = moment.tz(event.start.dateTime, "Asia/Singapore");
   var endDateTimeObj = moment.tz(event.end.dateTime, "Asia/Singapore");
+  evtMsg = breakdance(event.description);
+  evtMsg = evtMsg.replace(/\*\*/g, '*');
+  evtMsg = evtMsg.replace(/<br><br>/g, '\n');
+  evtMsg = evtMsg.replace(/<br>/g, '');
   return {
     id: crypto.HmacSHA1(event.id, 'SURGE').toString(),
     event_name: event.summary,
-    event_message: event.description,
+    event_message: evtMsg,
     event_location: event.location,
     event_date: startDateTimeObj.format("dddd, DD MMM YYYY"),
     event_date_raw: startDateTimeObj.format(),

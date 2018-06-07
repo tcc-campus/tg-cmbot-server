@@ -8,6 +8,9 @@ module.exports = {
   CACHE_DURATION: 600,
   DEV_GROUP_ID: process.env.DEV_GROUP_ID,
   SLACK_WEBHOOK: process.env.SLACK_WEBHOOK,
+  SLACK_APP_TOKEN: process.env.SLACK_APP_TOKEN,
+  SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN,
+  SLACK_TEAM_ID: process.env.SLACK_TEAM_ID,
   POSTGRES: {
     username: process.env.POSTGRES_USERNAME,
     password: process.env.POSTGRES_PASSWORD,

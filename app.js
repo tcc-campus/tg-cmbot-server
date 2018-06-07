@@ -8,12 +8,14 @@ const request = require('request');
 const index = require('./routes/index');
 const webhook = require('./routes/webhook');
 const event = require('./routes/event');
+const slack = require('./routes/slack');
 
 const tgCaller = require('./apiCallers/telegramCaller');
 const config = require('./config');
 const cacheProvider = require('./cache/cacheProvider');
 const cronSetup = require('./crons/cronSetup');
 const evtService = require('./services/eventService');
+const sbService = require('./services/subscriptionService');
 
 const app = express();
 
@@ -25,7 +27,8 @@ app.use(cookieParser());
 
 app.use('/', index);
 app.use(`/bot${config.BOT_TOKEN}`, webhook);
-app.use(`/event`, event);
+app.use('/event', event);
+app.use('/slack', slack);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -59,6 +62,9 @@ async function init() {
 
     // Set all events in cache
     evtService.setAll();
+
+    // Set all cells in cache
+    sbService.setSectionCellList();
   } catch (error) {
     console.log(error);
   }
