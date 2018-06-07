@@ -10,9 +10,9 @@ const breakdance = require('breakdance');
 const moment = require('moment-timezone');
 
 function formatEvent(event) {
-  var startDateTimeObj = moment.tz(event.start.dateTime, "Asia/Singapore");
-  var endDateTimeObj = moment.tz(event.end.dateTime, "Asia/Singapore");
-  evtMsg = breakdance(event.description);
+  const startDateTimeObj = moment.tz(event.start.dateTime, 'Asia/Singapore');
+  const endDateTimeObj = moment.tz(event.end.dateTime, 'Asia/Singapore');
+  let evtMsg = breakdance(event.description);
   evtMsg = evtMsg.replace(/\*\*/g, '*');
   evtMsg = evtMsg.replace(/<br><br>/g, '\n');
   evtMsg = evtMsg.replace(/<br>/g, '');
@@ -21,20 +21,20 @@ function formatEvent(event) {
     event_name: event.summary,
     event_message: evtMsg,
     event_location: event.location,
-    event_date: startDateTimeObj.format("dddd, DD MMM YYYY"),
+    event_date: startDateTimeObj.format('dddd, DD MMM YYYY'),
     event_date_raw: startDateTimeObj.format(),
     event_timing: {
-      start_time: startDateTimeObj.format("h:mm a"),
-      end_time: endDateTimeObj.format("h:mm a"),
-    }
-  }
+      start_time: startDateTimeObj.format('h:mm a'),
+      end_time: endDateTimeObj.format('h:mm a'),
+    },
+  };
 }
 
 function formatEventList(eventList) {
-  console.log("Formatting Event List with " + eventList.length + " events");
-  let formattedEventList = [];
-  for (var i = 0; i < eventList.length; i++) {
-    if(eventList[i].id !== '_6913ehho8ork4b9h6or4cb9k6oq3gba16t244ba16d236g9o64rjid1i74') {
+  console.log(`Formatting Event List with ${eventList.length} events`);
+  const formattedEventList = [];
+  for (let i = 0; i < eventList.length; i += 1) {
+    if (eventList[i].id !== '_6913ehho8ork4b9h6or4cb9k6oq3gba16t244ba16d236g9o64rjid1i74') {
       formattedEventList.push(formatEvent(eventList[i]));
     }
   }
@@ -44,4 +44,4 @@ function formatEventList(eventList) {
 module.exports = {
   formatEvent,
   formatEventList,
-}
+};

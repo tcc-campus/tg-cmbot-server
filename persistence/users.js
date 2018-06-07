@@ -8,6 +8,7 @@ const { Cell } = require('../models/cell');
 const sequelize = require('sequelize');
 
 const CREATE_USER_ACTION = 'action="createUser"';
+const GET_SUBSCRIBER_LIST_ACTION = 'action="getSubscriberList"';
 const GET_USER_ACTION = 'action="getUser"';
 const UPDATE_USER_ACTION = 'action="updateUser"';
 
@@ -73,8 +74,30 @@ async function updateUser(telegramId, updatedUser) {
   }
 }
 
+async function getListOfSubscribers() {
+  try {
+    const subscriberList = await User.findAll({
+      attributes: ['telegram_id'],
+      where: {
+        is_subscribed: {
+          [Op.eq]: true,
+        },
+      },
+    });
+    if (subscriberList.length > 0) {
+      console.log(`${GET_SUBSCRIBER_LIST_ACTION} user=${JSON.stringify(subscriberList)}`);
+      return subscriberList;
+    }
+    throw new Error('No subscribers found');
+  } catch (err) {
+    console.log(`${GET_SUBSCRIBER_LIST_ACTION} error="${err}"`);
+    throw new Error();
+  }
+}
+
 module.exports = {
   createUser,
+  getListOfSubscribers,
   getUser,
   updateUser,
 };

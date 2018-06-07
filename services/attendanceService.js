@@ -3,34 +3,54 @@
  */
 
 const tgCaller = require('../apiCallers/telegramCaller');
+const attendancePollPersistence = require('../persistence/attendancePolls');
+const userPersistence = require('../persistence/users');
 const attUtil = require('../utils/attendanceUtil');
 
 /**
- * Checks if Attendance Object is Valid
+ * Checks if Attendance Poll is Valid
  *
- * @param  {{event_id: string, event_message: string, event_image_url: string}} attendanceObj
+ * @param  {{event_id: string, google_cal_id: poll_message, poll_image_url: string}} attendancePoll
  *
  * @return {boolean}
  */
-function isAttendanceObjValid(attendanceObj) {
-  if (!attendanceObj.event_id) {
-    throw new Error('event_id not found');
-  } else if (!attendanceObj.event_message) {
-    throw new Error('event_message not found');
+function isAttendancePollValid(attendancePoll) {
+  if (!attendancePoll.google_cal_id) {
+    throw new Error('google_cal_id not found');
+  } else if (!attendancePoll.poll_message) {
+    throw new Error('poll_message not found');
   } else {
     return true;
   }
-  return false;
 }
 
-async function broadcastAttendanceMessage(attendanceObj) {
-  // TODO: Get list of subscribers
+async function getListOfSubscriberIds() {
+  const subscriberList = await userPersistence.getListOfSubscribers();
+  const subscriberIdList = [];
+  subscriberList.forEach((subscriber) => {
+    subscriberIdList.push(subscriber.telegram_id);
+  });
+  return subscriberIdList;
+}
+
+async function saveAttendancePoll(attendancePoll) {
+  const createdAttendancePoll = await attendancePollPersistence.createAttendancePoll(
+    attendancePoll.google_cal_id,
+    attendancePoll.poll_message,
+    attendancePoll.poll_image_url,
+  );
+  return createdAttendancePoll.id;
+}
+
+async function broadcastAttendanceMessage(attendancePoll) {
   try {
+    const attendancePollId = await saveAttendancePoll(attendancePoll);
     const options = {
-      inline_keyboard: attUtil.getInlineKeyboardForAttendanceBroadcast(attendanceObj.event_id),
-      image_url: attendanceObj.event_image_url, 
+      inline_keyboard: attUtil.getInlineKeyboardForAttendanceBroadcast(attendancePollId),
+      image_url: attendancePoll.poll_image_url,
     };
-    await tgCaller.sendMessageToList(['64094547'], attendanceObj.event_message, options);
+    const subscriberIdList = await getListOfSubscriberIds();
+    await tgCaller.sendMessageToList(subscriberIdList, attendancePoll.poll_message, options);
     console.log('Attendance Message successfully sent');
   } catch (error) {
     console.log(error);
@@ -39,5 +59,5 @@ async function broadcastAttendanceMessage(attendanceObj) {
 
 module.exports = {
   broadcastAttendanceMessage,
-  isAttendanceObjValid,
+  isAttendancePollValid,
 };
