@@ -7,10 +7,12 @@ const dtUtil = require('../utils/dateTimeUtil');
 const evtFormatter = require('../formatters/eventFormatter');
 const subFormatter = require('../formatters/subscriptionFormatter');
 const tgCaller = require('../apiCallers/telegramCaller');
+const attService = require('../services/attendanceService');
 const evtService = require('../services/eventService');
 const subService = require('../services/subscriptionService');
 
 const types = {
+  ATTENDANCE: 'attendance',
   UPCOMING: 'upcoming',
   EVENT: 'event',
   SUBSCRIPTION: 'subscription',
@@ -61,7 +63,6 @@ async function handleSubscriptionCallbackQuery(
   messageId,
   callbackQueryId,
   callbackQueryData,
-  firstName,
 ) {
   console.log('Handling subscription event callback query');
   const type = callbackQueryData.shift();
@@ -75,7 +76,7 @@ async function handleSubscriptionCallbackQuery(
     case 'main_menu':
       try {
         await Promise.all([
-          subService.sendSubscriptionDetails(chatId, firstName),
+          subService.goToSubscriptionMainMenu(chatId, messageId),
           tgCaller.sendAnswerCallbackQuery(callbackQueryId),
         ]);
       } catch (error) {
@@ -125,12 +126,50 @@ async function handleUserCallbackQuery(chatId, messageId, callbackQueryId, callb
   }
 }
 
+function handleAttendanceCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData) {
+  const type = callbackQueryData.shift();
+  const attendancePollId = callbackQueryData.shift();
+  switch (type) {
+    case 'set':
+      attService.updateAttendanceStatus(chatId, messageId, callbackQueryId, attendancePollId, true);
+      break;
+    case 'unset':
+      attService.updateAttendanceStatus(
+        chatId,
+        messageId,
+        callbackQueryId,
+        attendancePollId,
+        false,
+      );
+      break;
+    case 'guests':
+      attService.sendNumGuestKeyboard(chatId, messageId, callbackQueryId, attendancePollId);
+      break;
+    case 'main_menu':
+      attService.sendAttendanceMainMenu(chatId, messageId, callbackQueryId, attendancePollId);
+      break;
+    case 'plus': {
+      const numGuests = callbackQueryData.shift();
+      attService.updateAttendanceNumGuests(
+        chatId,
+        messageId,
+        callbackQueryId,
+        attendancePollId,
+        numGuests,
+      );
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 function handleCallbackQueryEvent(callbackQueryObj) {
   console.log('Handling Telegram Callback Query Event');
   const messageId = callbackQueryObj.message.message_id;
   const chatId = callbackQueryObj.message.chat.id;
   const callbackQueryId = callbackQueryObj.id;
-  const firstName = callbackQueryObj.message.chat.first_name;
+  // const firstName = callbackQueryObj.message.chat.first_name;
   const callbackQueryData = callbackQueryObj.data.split('/');
   const callbackQueryType = callbackQueryData.shift();
 
@@ -143,16 +182,13 @@ function handleCallbackQueryEvent(callbackQueryObj) {
       handleUpcomingEventDetailCallbackQuery(chatId, callbackQueryId, callbackQueryData);
       break;
     case types.SUBSCRIPTION:
-      handleSubscriptionCallbackQuery(
-        chatId,
-        messageId,
-        callbackQueryId,
-        callbackQueryData,
-        firstName,
-      );
+      handleSubscriptionCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
       break;
     case types.USER:
       handleUserCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
+      break;
+    case types.ATTENDANCE:
+      handleAttendanceCallbackQuery(chatId, messageId, callbackQueryId, callbackQueryData);
       break;
     default:
       console.log('Unknown callback query type');

@@ -10,6 +10,7 @@ const sequelize = require('sequelize');
 const CREATE_USER_ACTION = 'action="createUser"';
 const GET_SUBSCRIBER_LIST_ACTION = 'action="getSubscriberList"';
 const GET_USER_ACTION = 'action="getUser"';
+const GET_USER_MODEL_ACTION = 'action="getUserModel"';
 const UPDATE_USER_ACTION = 'action="updateUser"';
 
 const { Op } = sequelize;
@@ -38,6 +39,7 @@ async function getUser(telegramId) {
           attributes: ['cell_name', 'section_name'],
         },
       ],
+      raw: true,
     });
     if (user) {
       console.log(`${GET_USER_ACTION} user=${JSON.stringify(user)}`);
@@ -47,6 +49,27 @@ async function getUser(telegramId) {
     return null;
   } catch (err) {
     console.log(`${GET_USER_ACTION} error=${err}`);
+    throw new Error();
+  }
+}
+
+async function getUserModel(telegramId) {
+  try {
+    const user = await User.findOne({
+      where: {
+        telegram_id: {
+          [Op.eq]: telegramId,
+        },
+      },
+    });
+    if (user) {
+      console.log(`${GET_USER_MODEL_ACTION} user=${JSON.stringify(user)}`);
+      return user;
+    }
+    console.log(`${GET_USER_MODEL_ACTION} No user found with that id ${telegramId}`);
+    return null;
+  } catch (err) {
+    console.log(`${GET_USER_MODEL_ACTION} error=${err}`);
     throw new Error();
   }
 }
@@ -99,5 +122,6 @@ module.exports = {
   createUser,
   getListOfSubscribers,
   getUser,
+  getUserModel,
   updateUser,
 };

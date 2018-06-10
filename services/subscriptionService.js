@@ -25,6 +25,20 @@ async function sendSubscriptionDetails(chatId, firstName) {
   }
 }
 
+async function goToSubscriptionMainMenu(chatId, messageId) {
+  try {
+    let user = {};
+    [user] = await Promise.all([
+      userPersistence.getUser(chatId),
+      tgCaller.sendChatAction(chatId, 'typing'),
+    ]);
+    const inlineKeyboard = subFormatter.getInlineKeyboardForSubscriptionDetails(user);
+    await tgCaller.editInlineKeyboardOnly(chatId, messageId, inlineKeyboard);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function updateUserSubscription(chatId, messageId, callbackQueryId, isSubscribed) {
   const subscribeText = isSubscribed ? 'Subscription' : 'Unsubscribed';
   try {
@@ -116,6 +130,7 @@ module.exports = {
   getCellId,
   getSectionList,
   getSectionObj,
+  goToSubscriptionMainMenu,
   sendSubscriptionDetails,
   setSectionCellList,
   updateUserCell,
