@@ -1,7 +1,9 @@
 /**
  * Formatter for event messages and inline keyboards
  */
-const moment = require('moment');
+const crypto = require('crypto-js');
+const breakdance = require('breakdance');
+const moment = require('moment-timezone');
 
 function getMessageForUpcomingEventList(formattedEventList, requestedMonth) {
   console.log('Formatting upcoming message');
@@ -70,7 +72,42 @@ function getInlineKeyboardForEventDetail(eventList) {
   return inlineKeyboardButtonList;
 }
 
+function formatEvent(event) {
+  const startDateTimeObj = moment.tz(event.start.dateTime, 'Asia/Singapore');
+  const endDateTimeObj = moment.tz(event.end.dateTime, 'Asia/Singapore');
+  let evtMsg = breakdance(event.description);
+  evtMsg = evtMsg.replace(/\*\*/g, '*');
+  evtMsg = evtMsg.replace(/<br><br>/g, '\n');
+  evtMsg = evtMsg.replace(/<br>/g, '');
+  return {
+    id: crypto.HmacSHA1(event.id, 'SURGE').toString(),
+    google_cal_id: event.id,
+    event_name: event.summary,
+    event_message: evtMsg,
+    event_location: event.location,
+    event_date: startDateTimeObj.format('dddd, DD MMM YYYY'),
+    event_date_raw: startDateTimeObj.format(),
+    event_timing: {
+      start_time: startDateTimeObj.format('h:mm a'),
+      end_time: endDateTimeObj.format('h:mm a'),
+    },
+  };
+}
+
+function formatEventList(eventList) {
+  console.log(`Formatting Event List with ${eventList.length} events`);
+  const formattedEventList = [];
+  for (let i = 0; i < eventList.length; i += 1) {
+    if (eventList[i].id !== '_6913ehho8ork4b9h6or4cb9k6oq3gba16t244ba16d236g9o64rjid1i74') {
+      formattedEventList.push(formatEvent(eventList[i]));
+    }
+  }
+  return formattedEventList;
+}
+
 module.exports = {
+  formatEvent,
+  formatEventList,
   getMessageForUpcomingEventDetail,
   getMessageForUpcomingEventList,
   getInlineKeyboardForEventDetail,

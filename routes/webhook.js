@@ -1,10 +1,10 @@
 const express = require('express');
-const request = require('request');
 const evtHandler = require('../handlers/eventHandler');
-var router = express.Router();
+
+const router = express.Router();
 
 // Receive Events from Telegram
-router.post('/', function(req, res) {
+router.post('/', (req, res) => {
   const eventObj = req.body;
   console.log('received event from telegram:', JSON.stringify(eventObj));
   evtHandler.handleTgEvent(eventObj);

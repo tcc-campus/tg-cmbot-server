@@ -7,6 +7,7 @@ function start() {
   console.log('Starting cache provider.');
 
   if (is.empty(cache)) {
+    cache.attendance = new NodeCache();
     cache.events = new NodeCache();
     cache.dates = new NodeCache();
     cache.users = new NodeCache();

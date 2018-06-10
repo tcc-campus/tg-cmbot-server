@@ -89,6 +89,55 @@ async function sendMessage(chatId, message, options) {
 }
 
 /**
+ * Sends a Chat Action to a Telegram User
+ * Available Actions: typing, upload_photo, record_video, upload_video,
+ * record_audio, upload_audio, upload_document, find_location, record_video_note,
+ * upload_video_note
+ *
+ * @param {string} chatId
+ * @param {string} actionToSend
+ *
+ * @public
+ */
+async function sendChatAction(chatId, actionToSend) {
+  console.log(`Sending chat action (${actionToSend}) to chat_id: ${chatId}`);
+  const payload = {
+    chat_id: chatId,
+    action: actionToSend,
+  };
+  try {
+    const result = await postToTelegram('sendChatAction', payload);
+    console.log(`Message sent to ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send chat action to ${chatId}. ${error}`);
+  }
+}
+
+/**
+ * Send a Photo to a Telegram User
+ * @param {string} chatId
+ * @param {string} imgUrl
+ *
+ * @public
+ */
+async function sendPhoto(chatId, imgUrl) {
+  console.log(`Sending photo (${imgUrl}) to ${chatId}`);
+  await sendChatAction(chatId, 'upload_photo').catch((error) => {
+    console.log(error);
+  });
+  const payload = {
+    chat_id: chatId,
+    photo: imgUrl,
+  };
+  try {
+    const result = await postToTelegram('sendPhoto', payload);
+    console.log(`Photo Sent to chat_id: ${chatId}. ${result}`);
+  } catch (error) {
+    throw new Error(`Error: Failed to send photo to ${chatId}. ${error}`);
+  }
+}
+
+/**
  * Send Message with Forced Reply to Telegram User
  *
  * @param {string} chatId
@@ -176,32 +225,33 @@ async function sendMessageWithReplyKeyboardRemoved(chatId, message) {
 async function sendMessageToList(chatIdList, message, options) {
   console.log('Sending message to list of chatIds:', chatIdList);
 
-  const waitQueue = () => new Promise((resolve) => {
-    const q = async.queue(async (chatId) => {
-      try {
-        if (options && options['image_url']) {
-          await sendPhoto(chatId, options['image_url']);
+  const waitQueue = () =>
+    new Promise((resolve) => {
+      const q = async.queue(async (chatId) => {
+        try {
+          if (options && options.image_url) {
+            await sendPhoto(chatId, options.image_url);
+          }
+          if (options && options.inline_keyboard) {
+            await sendMessageWithInlineKeyboard(chatId, message, options.inline_keyboard);
+          } else {
+            await sendMessage(chatId, message, {
+              parse_mode: 'markdown',
+            });
+          }
+          await sleep(randomUtil.getRandomIntInclusive(100, 300));
+        } catch (error) {
+          console.log(`Unable to send message to ${chatId}`);
         }
-        if (options && options['inline_keyboard']) {
-          await sendMessageWithInlineKeyboard(chatId, message, options['inline_keyboard']);
-        } else {
-          await sendMessage(chatId, message, {
-            parse_mode: 'markdown',
-          });
-        }
-        await sleep(randomUtil.getRandomIntInclusive(100, 300));
-      } catch (error) {
-        console.log(`Unable to send message to ${chatId}`);
-      }
-    }, 15);
+      }, 15);
 
-    q.push(chatIdList);
+      q.push(chatIdList);
 
-    q.drain = () => {
-      console.log('Message successfully sent to list of chatIds');
-      resolve();
-    };
-  });
+      q.drain = () => {
+        console.log('Message successfully sent to list of chatIds');
+        resolve();
+      };
+    });
 
   await waitQueue();
 }
@@ -292,31 +342,6 @@ async function editInlineKeyboardOnly(chatId, msgId, inlineKeyboardButtonList) {
 }
 
 /**
- * Sends a Chat Action to a Telegram User
- * Available Actions: typing, upload_photo, record_video, upload_video,
- * record_audio, upload_audio, upload_document, find_location, record_video_note,
- * upload_video_note
- *
- * @param {string} chatId
- * @param {string} actionToSend
- *
- * @public
- */
-async function sendChatAction(chatId, actionToSend) {
-  console.log(`Sending chat action (${actionToSend}) to chat_id: ${chatId}`);
-  const payload = {
-    chat_id: chatId,
-    action: actionToSend,
-  };
-  try {
-    const result = await postToTelegram('sendChatAction', payload);
-    console.log(`Message sent to ${chatId}. ${result}`);
-  } catch (error) {
-    throw new Error(`Error: Failed to send chat action to ${chatId}. ${error}`);
-  }
-}
-
-/**
  * Send Answer Callback Query to Telegram User.
  * Use this method whenever the Telegram User clicks on a button.
  *
@@ -339,30 +364,6 @@ async function sendAnswerCallbackQuery(callbackQueryId, callbackOptions) {
     console.log(`Answer Callback Query sent to callback_query_id: ${callbackQueryId}. ${result}`);
   } catch (error) {
     throw new Error(`Error: Failed to send answer callback query to ${callbackQueryId}. ${error}`);
-  }
-}
-
-/**
- * Send a Photo to a Telegram User
- * @param {string} chatId
- * @param {string} imgUrl
- *
- * @public
- */
-async function sendPhoto(chatId, imgUrl) {
-  console.log(`Sending photo (${imgUrl}) to ${chatId}`);
-  await sendChatAction(chatId, 'upload_photo').catch((error) => {
-    console.log(error);
-  });
-  const payload = {
-    chat_id: chatId,
-    photo: imgUrl,
-  };
-  try {
-    const result = await postToTelegram('sendPhoto', payload);
-    console.log(`Photo Sent to chat_id: ${chatId}. ${result}`);
-  } catch (error) {
-    throw new Error(`Error: Failed to send photo to ${chatId}. ${error}`);
   }
 }
 

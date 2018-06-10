@@ -1,6 +1,7 @@
 const cacheProvider = require('./cacheProvider');
 
 const CACHE_TABLE = {
+  ATTENDANCE: 'attendance',
   EVENTS: 'events',
   DATES: 'dates',
   USERS: 'users',
@@ -33,7 +34,7 @@ function get(table, key) {
         console.log(`Got cache value for key: ${key}`);
         resolve(result);
       } else {
-        reject(new Error(`Unable to get cache value for key: ${key} => Err: No Value`))
+        reject(new Error(`Unable to get cache value for key: ${key} => Err: No Value`));
       }
     });
   });

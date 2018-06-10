@@ -5,7 +5,7 @@ const async = require('async');
 const moment = require('moment-timezone');
 
 const cService = require('../cache/cacheService');
-const evtFormatter = require('../utils/eventFormatter');
+const evtFormatter = require('../formatters/eventFormatter');
 const gCaller = require('../apiCallers/googleCaller');
 
 // cache
@@ -87,6 +87,7 @@ async function setAll() {
     const formattedEventsData = evtFormatter.formatEventList(eventsData);
     console.log('Setting events data in cache');
     await Promise.all([
+      cService.set(cService.cacheTables.GENERAL, 'event_list', formattedEventsData, CACHE_TTL),
       updateDatesCache(formattedEventsData),
       updateEventsCache(formattedEventsData),
     ]);
@@ -124,8 +125,21 @@ async function getByMonth(dateString) {
   return eventList;
 }
 
+/**
+ * Gets the whole list of events
+ *
+ * @public
+ *
+ * @return [] Array of events
+ */
+async function getAll() {
+  const eventList = await cService.get(cService.cacheTables.GENERAL, 'event_list');
+  return eventList;
+}
+
 module.exports = {
   setAll,
+  getAll,
   getById,
   getByMonth,
 };

@@ -14,6 +14,7 @@ const tgCaller = require('./apiCallers/telegramCaller');
 const config = require('./config');
 const cacheProvider = require('./cache/cacheProvider');
 const cronSetup = require('./crons/cronSetup');
+const attService = require('./services/attendanceService');
 const evtService = require('./services/eventService');
 const sbService = require('./services/subscriptionService');
 
@@ -65,6 +66,9 @@ async function init() {
 
     // Set all cells in cache
     sbService.setSectionCellList();
+
+    // Set all attendance polls in cache
+    attService.cacheAttendancePollList();
   } catch (error) {
     console.log(error);
   }
