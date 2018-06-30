@@ -24,7 +24,7 @@ module.exports = {
     key: process.env.GOOGLE_CAL_KEY.replace(/\\n/g, '\n'),
     timezone: 'UTC+08:00',
     calendarId: {
-    	'primary': process.env.GOOGLE_CAL_ID,
+      primary: process.env.GOOGLE_CAL_ID,
     },
-  }
-}
+  },
+};

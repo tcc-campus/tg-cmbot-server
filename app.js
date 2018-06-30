@@ -9,6 +9,7 @@ const index = require('./routes/index');
 const webhook = require('./routes/webhook');
 const event = require('./routes/event');
 const slack = require('./routes/slack');
+const cell = require('./routes/cell');
 
 const tgCaller = require('./apiCallers/telegramCaller');
 const config = require('./config');
@@ -28,6 +29,7 @@ app.use(cookieParser());
 
 app.use('/', index);
 app.use(`/bot${config.BOT_TOKEN}`, webhook);
+app.use('/cell', cell);
 app.use('/event', event);
 app.use('/slack', slack);
 

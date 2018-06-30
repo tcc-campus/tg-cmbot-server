@@ -126,8 +126,14 @@ async function getSectionList() {
   return Object.keys(cellList);
 }
 
+async function getCellMemberList() {
+  const cellMemberList = await cellPersistence.getCellMemberList();
+  return cellMemberList;
+}
+
 module.exports = {
   getCellId,
+  getCellMemberList,
   getSectionList,
   getSectionObj,
   goToSubscriptionMainMenu,
