@@ -12,18 +12,21 @@ const axios = require('axios');
  * @private
  */
 async function postToSlack(url, data, token) {
-  const payload = Object.assign({
-    username: 'CampusBot',
-    icon_emoji: ':robot_face:',
-  }, data);
+  const payload = Object.assign(
+    {
+      username: 'CampusBot',
+      icon_emoji: ':robot_face:',
+    },
+    data,
+  );
   const options = {
-    url: url,
+    url,
     method: 'post',
     headers: {
       'content-type': 'application/json',
     },
     data: payload,
-  }
+  };
   if (token) {
     options.headers.Authorization = `Bearer ${token}`;
   }
@@ -39,7 +42,7 @@ async function postToSlack(url, data, token) {
 }
 
 async function postToDevelopersChannel(data) {
-  await postToSlack(config.SLACK_WEBHOOK, data)
+  await postToSlack(config.SLACK_WEBHOOK, data);
 }
 
 async function postToSlackApi(endpoint, data) {
@@ -48,7 +51,28 @@ async function postToSlackApi(endpoint, data) {
   return response;
 }
 
+async function respondToSlackCommand(url, msg) {
+  const options = {
+    url,
+    method: 'post',
+    headers: {
+      'content-type': 'application/json',
+    },
+    data: { text: msg },
+  };
+  try {
+    const response = await axios(options);
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify(response.data));
+    }
+    return JSON.stringify(response.data);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 module.exports = {
   postToDevelopersChannel,
-  postToSlackApi
+  postToSlackApi,
+  respondToSlackCommand,
 };
