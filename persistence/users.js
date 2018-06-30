@@ -43,6 +43,10 @@ async function getUser(telegramId) {
     });
     if (user) {
       console.log(`${GET_USER_ACTION} user=${JSON.stringify(user)}`);
+      user.cell = {
+        cell_name: user['cell.cell_name'],
+        section_name: user['cell.section_name'],
+      };
       return user;
     }
     console.log(`${GET_USER_ACTION} No user found with that id ${telegramId}`);
